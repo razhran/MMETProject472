@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydraulic Efficiency Logger</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+        
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #e0f2fe;
+            --secondary-text: #0284c7;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --success-hover: #059669;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        }
+        
+        body[dir="ltr"] { font-family: 'Inter', system-ui, sans-serif; }
+        body[dir="rtl"] { font-family: 'Tajawal', Tahoma, sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 15px; /* قللت الحواف عشان شاشات الجوال */
+            transition: all 0.3s ease; 
+        }
+        
+        .container { max-width: 650px; margin: auto; }
+        
+        .card { 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        /* الترويسة */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .header-text { display: flex; flex-direction: column; }
+        h1 { font-size: 1.4rem; margin: 0; color: var(--text-main); font-weight: 800; }
+        .project-badge { 
+            background: var(--secondary); 
+            color: var(--secondary-text); 
+            padding: 6px 12px; 
+            border-radius: 8px; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            margin-top: 5px; 
+            display: inline-block; 
+            width: fit-content; 
+        }
+        
+        .lang-btn { 
+            background: var(--card); 
+            color: var(--text-main);
+            border: 2px solid var(--border); 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            font-family: inherit;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        
+        /* الإدخال */
+        .form-group { margin-bottom: 15px; width: 100%; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-muted); }
+        select, input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid var(--border); 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            outline: none; 
+            transition: all 0.3s; 
+            background-color: #f8fafc;
+            font-family: inherit;
+            font-weight: 600;
+            box-sizing: border-box;
+        }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .flex-col { display: flex; flex-direction: column; gap: 15px; } 
+        
+        /* العداد والمؤقت - حل مشكلة التداخل */
+        .display-box { 
+            text-align: center; 
+            padding: 20px 15px; 
+            background: linear-gradient(145deg, #ffffff, #f1f5f9); 
+            border-radius: var(--radius); 
+            border: 1px solid var(--border); 
+            overflow: hidden; /* يمنع خروج العناصر */
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .big-number { 
+            /* حجم خط متجاوب: يكبر ويصغر حسب عرض الشاشة */
+            font-size: clamp(2rem, 10vw, 3.5rem); 
+            font-weight: 800; 
+            color: var(--primary); 
+            margin: 15px 0; 
+            font-family: 'Courier New', Courier, monospace; 
+            text-shadow: 2px 2px 0px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* الأزرار */
+        .btn { 
+            padding: 12px; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            font-family: inherit;
+            cursor: pointer; 
+            width: 100%; 
+            color: white; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: block; 
+            text-align: center; 
+            box-sizing: border-box;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--primary); box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
+        .btn-success { background: var(--success); box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); }
+        .btn-danger { background: var(--danger); box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); }
+        .btn-outline { 
+            background: transparent; 
+            color: var(--text-main); 
+            border: 2px solid var(--border); 
+            margin-top: 10px; 
+            box-shadow: none;
+        }
+        
+        /* الجدول - حل مشكلة الحوسة */
+        .table-container { 
+            overflow-x: auto; /* يسمح بالسحب الأفقي */
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            width: 100%;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: center; 
+            font-size: 0.9rem; 
+            background: var(--card); 
+            white-space: nowrap; /* يمنع الكلمة من النزول سطر جديد */
+        }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); }
+        th { background: #f1f5f9; font-weight: 800; color: var(--text-muted); }
+        
+        /* المقارنة */
+        .comparison-result { 
+            margin-top: 15px; 
+            padding: 15px; 
+            background: #f0fdf4; 
+            border: 1px solid #bbf7d0;
+            border-radius: 12px; 
+            color: #166534; 
+            font-weight: 700; 
+            text-align: center; 
+            display: none; 
+            line-height: 1.6; 
+            font-size: 1rem;
+        }
+        
+        .footer { text-align: center; margin-top: 30px; padding: 15px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; }
+        
+        /* تعديلات مخصصة للشاشات الصغيرة جداً */
+        @media (max-width: 400px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 10px; }
+            .header { justify-content: center; text-align: center; }
+            .header-text { align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-text">
+            <h1 id="appTitle">سجل بيانات الهيدروليك</h1>
+            <span class="project-badge" id="badgeTop">⚙️ MMET Project 472</span>
+        </div>
+        <button class="lang-btn" onclick="toggleLang()">EN / AR</button>
+    </div>
+
+    <div class="card">
+        <div class="grid-2">
+            <div class="form-group">
+                <label id="lblOil">نوع الزيت</label>
+                <select id="oilType">
+                    <option value="ISO VG 32">ISO VG 32</option>
+                    <option value="ISO VG 46">ISO VG 46</option>
+                    <option value="ISO VG 68">ISO VG 68</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label id="lblTemp">درجة الحرارة (°C)</label>
+                <input type="number" id="temperature" value="25">
+            </div>
+        </div>
+    </div>
+
+    <div class="card flex-col">
+        <div class="display-box">
+            <label id="lblStrokes" style="font-size: 1rem; color: var(--text-muted);">عدد الضغطات</label>
+            <div class="big-number" id="counterDisplay">0</div>
+            <div class="grid-2">
+                <button class="btn btn-primary" id="btnStroke" onclick="incrementCounter()" style="padding: 15px; font-size: 1.2rem;">+ ضغطة</button>
+                <button class="btn btn-outline" id="btnResetStroke" onclick="resetCounter()" style="margin-top: 0;">تصفير</button>
+            </div>
+        </div>
+        
+        <div class="display-box">
+            <label id="lblTime" style="font-size: 1rem; color: var(--text-muted);">المؤقت الزمني</label>
+            <div class="big-number" id="timerDisplay">00:00:00</div>
+            <div class="grid-2">
+                <button class="btn btn-success" id="btnStart" onclick="startTimer()" style="padding: 15px;">بدء</button>
+                <button class="btn btn-danger" id="btnStop" onclick="stopTimer()" style="padding: 15px;">إيقاف</button>
+            </div>
+            <button class="btn btn-outline" id="btnResetTime" onclick="resetTimer()">تصفير المؤقت</button>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" id="btnSave" onclick="saveRecord()" style="margin-bottom: 20px; font-size: 1.1rem; padding: 15px;">💾 حفظ القراءة الحالية</button>
+
+    <div class="card">
+        <h2 id="titleCompare" style="font-size: 1.2rem; margin-top: 0; color: var(--text-main); font-weight: 800;">📊 تحليل الكفاءة (معدل الضخ)</h2>
+        <div class="grid-2">
+            <div class="form-group">
+                <label id="lblComp1">القراءة الأولى</label>
+                <select id="comp1"></select>
+            </div>
+            <div class="form-group">
+                <label id="lblComp2">القراءة الثانية</label>
+                <select id="comp2"></select>
+            </div>
+        </div>
+        <button class="btn btn-success" id="btnCompare" onclick="compareRecords()" style="margin-top: 10px;">قارن النتائج</button>
+        <div id="compareResult" class="comparison-result"></div>
+    </div>
+
+    <div class="card">
+        <h2 id="titleLog" style="font-size: 1.2rem; margin-top: 0; color: var(--text-main); font-weight: 800;">📋 سجل البيانات المحفوظة</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th id="thID">#</th>
+                        <th id="thOil">الزيت</th>
+                        <th id="thTemp">الحرارة</th>
+                        <th id="thStrokes">الضغطات</th>
+                        <th id="thTime">الوقت</th>
+                        <th id="thRate">معدل الضخ (ض/ث)</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="grid-2" style="margin-top: 15px;">
+            <button class="btn btn-primary" id="btnExport" onclick="exportCSV()" style="background: var(--text-main);">📥 تصدير (CSV)</button>
+            <button class="btn btn-danger" id="btnClear" onclick="clearLog()">🗑️ مسح السجل</button>
+        </div>
+    </div>
+
+    <div class="footer" id="footerText">
+        تم التطوير لمشروع MMET Project 472
+    </div>
+
+</div>
+
+<script>
+    let currentLang = 'ar';
+    const translations = {
+        ar: {
+            appTitle: "سجل بيانات الهيدروليك", lblOil: "نوع الزيت", lblTemp: "درجة الحرارة (°C)",
+            lblStrokes: "عدد الضغطات", btnStroke: "+ ضغطة", btnResetStroke: "تصفير",
+            lblTime: "المؤقت الزمني", btnStart: "بدء", btnStop: "إيقاف", btnResetTime: "تصفير المؤقت",
+            btnSave: "💾 حفظ القراءة الحالية", titleCompare: "📊 تحليل الكفاءة (معدل الضخ)",
+            lblComp1: "القراءة الأولى", lblComp2: "القراءة الثانية", btnCompare: "قارن النتائج",
+            titleLog: "📋 سجل البيانات المحفوظة", thID: "#", thOil: "الزيت", thTemp: "الحرارة",
+            thStrokes: "الضغطات", thTime: "الوقت", thRate: "معدل الضخ (ض/ث)", 
+            btnClear: "🗑️ مسح السجل", btnExport: "📥 تصدير (CSV)",
+            rateUnit: "ض/ث", winMsg: "معدل ضخ أسرع بنسبة", readWord: "قراءة",
+            badgeTop: "⚙️ MMET Project 472", footerText: "تم التطوير لمشروع MMET Project 472"
+        },
+        en: {
+            appTitle: "Hydraulic Data Logger", lblOil: "Oil Type", lblTemp: "Temperature (°C)",
+            lblStrokes: "Strokes Count", btnStroke: "+ Stroke", btnResetStroke: "Reset",
+            lblTime: "Timer", btnStart: "Start", btnStop: "Stop", btnResetTime: "Reset Timer",
+            btnSave: "💾 Save Current Record", titleCompare: "📊 Efficiency Analysis (Flow Rate)",
+            lblComp1: "First Record", lblComp2: "Second Record", btnCompare: "Compare Results",
+            titleLog: "📋 Saved Data Log", thID: "ID", thOil: "Oil", thTemp: "Temp",
+            thStrokes: "Strokes", thTime: "Time", thRate: "Flow Rate (stk/s)", 
+            btnClear: "🗑️ Clear Logs", btnExport: "📥 Export CSV",
+            rateUnit: "stk/s", winMsg: "Faster flow rate by", readWord: "Record",
+            badgeTop: "⚙️ MMET Project 472", footerText: "Developed for MMET Project 472"
+        }
+    };
+
+    function toggleLang() {
+        currentLang = currentLang === 'ar' ? 'en' : 'ar';
+        document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = currentLang;
+        
+        for (const key in translations[currentLang]) {
+            const el = document.getElementById(key);
+            if (el) el.innerText = translations[currentLang][key];
+        }
+        renderLogs(); 
+    }
+
+    let count = 0;
+    let startTime, updatedTime, difference, tInterval, running = false;
+    let totalSeconds = 0;
+
+    function incrementCounter() { count++; document.getElementById('counterDisplay').innerText = count; }
+    function resetCounter() { count = 0; document.getElementById('counterDisplay').innerText = count; }
+
+    function startTimer() {
+        if (!running) {
+            startTime = new Date().getTime() - (difference || 0);
+            tInterval = setInterval(updateTime, 10);
+            running = true;
+            document.getElementById('btnStart').innerText = currentLang === 'ar' ? "مستمر..." : "Running...";
+        }
+    }
+    function stopTimer() {
+        clearInterval(tInterval);
+        running = false;
+        document.getElementById('btnStart').innerText = currentLang === 'ar' ? "بدء" : "Start";
+    }
+    function resetTimer() {
+        clearInterval(tInterval);
+        running = false; difference = 0; totalSeconds = 0;
+        document.getElementById('timerDisplay').innerText = "00:00:00";
+        document.getElementById('btnStart').innerText = currentLang === 'ar' ? "بدء" : "Start";
+    }
+    function updateTime() {
+        updatedTime = new Date().getTime();
+        difference = updatedTime - startTime;
+        totalSeconds = difference / 1000;
+        
+        let m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        let s = Math.floor((difference % (1000 * 60)) / 1000);
+        let ms = Math.floor((difference % 1000) / 10);
+        document.getElementById('timerDisplay').innerText = 
+            (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s) + ":" + (ms < 10 ? "0" + ms : ms);
+    }
+
+    function saveRecord() {
+        if (count === 0 || totalSeconds === 0) {
+            alert(currentLang === 'ar' ? "يجب تسجيل ضغطات ووقت قبل الحفظ!" : "Must record strokes and time!");
+            return;
+        }
+
+        const flowRate = (count / totalSeconds).toFixed(2);
+        
+        const record = {
+            id: Date.now(),
+            displayId: (JSON.parse(localStorage.getItem('hydroLogs')) || []).length + 1,
+            oil: document.getElementById('oilType').value,
+            temp: document.getElementById('temperature').value,
+            strokes: count,
+            time: document.getElementById('timerDisplay').innerText,
+            rate: parseFloat(flowRate)
+        };
+
+        let logs = JSON.parse(localStorage.getItem('hydroLogs')) || [];
+        logs.push(record);
+        localStorage.setItem('hydroLogs', JSON.stringify(logs));
+        renderLogs();
+    }
+
+    function renderLogs() {
+        const logs = JSON.parse(localStorage.getItem('hydroLogs')) || [];
+        const tbody = document.getElementById('logTableBody');
+        const comp1 = document.getElementById('comp1');
+        const comp2 = document.getElementById('comp2');
+        
+        tbody.innerHTML = ''; comp1.innerHTML = ''; comp2.innerHTML = '';
+        
+        const rateText = translations[currentLang].rateUnit;
+        const readText = translations[currentLang].readWord;
+
+        logs.forEach(log => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${log.displayId}</td><td>${log.oil}</td><td><span style="color:var(--danger); font-weight:bold;">${log.temp}</span></td><td>${log.strokes}</td><td>${log.time}</td><td><strong style="color:var(--primary); font-size:1.1rem;">${log.rate}</strong> ${rateText}</td>`;
+            tbody.appendChild(tr);
+
+            const optionText = `${readText} ${log.displayId} (${log.oil} @ ${log.temp}°C)`;
+            comp1.innerHTML += `<option value="${log.rate}">${optionText}</option>`;
+            comp2.innerHTML += `<option value="${log.rate}">${optionText}</option>`;
+        });
+    }
+
+    function compareRecords() {
+        const r1 = parseFloat(document.getElementById('comp1').value);
+        const r2 = parseFloat(document.getElementById('comp2').value);
+        const resultDiv = document.getElementById('compareResult');
+        
+        if (!r1 || !r2) return;
+
+        resultDiv.style.display = 'block';
+        if (r1 === r2) {
+            resultDiv.innerText = currentLang === 'ar' ? "معدل الضخ متطابق في القراءتين." : "Flow rate is identical.";
+            return;
+        }
+
+        const bestText = r1 > r2 ? document.getElementById('comp1').options[document.getElementById('comp1').selectedIndex].text : document.getElementById('comp2').options[document.getElementById('comp2').selectedIndex].text;
+        
+        const max = Math.max(r1, r2);
+        const min = Math.min(r1, r2);
+        const diffPercentage = (((max - min) / min) * 100).toFixed(1);
+        
+        resultDiv.innerHTML = `🚀 <strong>${bestText}</strong><br>${translations[currentLang].winMsg} <span style="font-size: 1.1rem; color: #059669; font-weight: 900;">${diffPercentage}%</span>`;
+    }
+
+    function clearLog() {
+        if(confirm(currentLang === 'ar' ? "متأكد من مسح كل البيانات؟" : "Are you sure you want to clear all data?")) {
+            localStorage.removeItem('hydroLogs');
+            document.getElementById('compareResult').style.display = 'none';
+            renderLogs();
+        }
+    }
+
+    function exportCSV() {
+        const logs = JSON.parse(localStorage.getItem('hydroLogs')) || [];
+        if (logs.length === 0) {
+            alert(currentLang === 'ar' ? "لا توجد بيانات لتصديرها!" : "No data to export!");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+        
+        const headers = currentLang === 'ar' ? 
+            "رقم القراءة,نوع الزيت,درجة الحرارة,عدد الضغطات,الوقت,معدل الضخ (ضغطة/ث)\n" : 
+            "ID,Oil Type,Temperature,Strokes,Time,Flow Rate (stk/s)\n";
+        csvContent += headers;
+
+        logs.forEach(log => {
+            csvContent += `${log.displayId},${log.oil},${log.temp},${log.strokes},${log.time},${log.rate}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Hydraulic_Data_Project472.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    window.onload = function() {
+        document.getElementById('footerText').innerText = translations[currentLang].footerText;
+        renderLogs();
+    };
+</script>
+
+</body>
+</html>
