@@ -28,159 +28,49 @@
         body[dir="ltr"] { font-family: 'Inter', system-ui, sans-serif; }
         body[dir="rtl"] { font-family: 'Tajawal', Tahoma, sans-serif; }
         
-        body { 
-            background-color: var(--bg); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding: 15px; /* قللت الحواف عشان شاشات الجوال */
-            transition: all 0.3s ease; 
-        }
-        
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px; transition: all 0.3s ease; }
         .container { max-width: 650px; margin: auto; }
         
-        .card { 
-            background: var(--card); 
-            padding: 20px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow); 
-            margin-bottom: 20px; 
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
+        .card { background: var(--card); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid rgba(226, 232, 240, 0.8); }
         
         /* الترويسة */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .header-text { display: flex; flex-direction: column; }
         h1 { font-size: 1.4rem; margin: 0; color: var(--text-main); font-weight: 800; }
-        .project-badge { 
-            background: var(--secondary); 
-            color: var(--secondary-text); 
-            padding: 6px 12px; 
-            border-radius: 8px; 
-            font-size: 0.8rem; 
-            font-weight: 700; 
-            margin-top: 5px; 
-            display: inline-block; 
-            width: fit-content; 
-        }
-        
-        .lang-btn { 
-            background: var(--card); 
-            color: var(--text-main);
-            border: 2px solid var(--border); 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-weight: 700; 
-            font-family: inherit;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
+        .project-badge { background: var(--secondary); color: var(--secondary-text); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; margin-top: 5px; display: inline-block; width: fit-content; }
+        .lang-btn { background: var(--card); color: var(--text-main); border: 2px solid var(--border); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 700; font-family: inherit; transition: 0.2s; white-space: nowrap; }
         
         /* الإدخال */
         .form-group { margin-bottom: 15px; width: 100%; }
         label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem; color: var(--text-muted); }
-        select, input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid var(--border); 
-            border-radius: 10px; 
-            font-size: 1rem; 
-            outline: none; 
-            transition: all 0.3s; 
-            background-color: #f8fafc;
-            font-family: inherit;
-            font-weight: 600;
-            box-sizing: border-box;
-        }
+        select, input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem; outline: none; transition: all 0.3s; background-color: #f8fafc; font-family: inherit; font-weight: 600; box-sizing: border-box; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .flex-col { display: flex; flex-direction: column; gap: 15px; } 
         
-        /* العداد والمؤقت - حل مشكلة التداخل */
-        .display-box { 
-            text-align: center; 
-            padding: 20px 15px; 
-            background: linear-gradient(145deg, #ffffff, #f1f5f9); 
-            border-radius: var(--radius); 
-            border: 1px solid var(--border); 
-            overflow: hidden; /* يمنع خروج العناصر */
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .big-number { 
-            /* حجم خط متجاوب: يكبر ويصغر حسب عرض الشاشة */
-            font-size: clamp(2rem, 10vw, 3.5rem); 
-            font-weight: 800; 
-            color: var(--primary); 
-            margin: 15px 0; 
-            font-family: 'Courier New', Courier, monospace; 
-            text-shadow: 2px 2px 0px rgba(37, 99, 235, 0.1);
-        }
+        /* العداد والمؤقت */
+        .display-box { text-align: center; padding: 20px 15px; background: linear-gradient(145deg, #ffffff, #f1f5f9); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; width: 100%; box-sizing: border-box; }
+        .big-number { font-size: clamp(2rem, 10vw, 3.5rem); font-weight: 800; color: var(--primary); margin: 15px 0; font-family: 'Courier New', Courier, monospace; text-shadow: 2px 2px 0px rgba(37, 99, 235, 0.1); }
         
         /* الأزرار */
-        .btn { 
-            padding: 12px; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 1rem; 
-            font-weight: 700; 
-            font-family: inherit;
-            cursor: pointer; 
-            width: 100%; 
-            color: white; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: block; 
-            text-align: center; 
-            box-sizing: border-box;
-        }
+        .btn { padding: 12px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; width: 100%; color: white; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: block; text-align: center; box-sizing: border-box; }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--primary); box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
         .btn-success { background: var(--success); box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); }
         .btn-danger { background: var(--danger); box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); }
-        .btn-outline { 
-            background: transparent; 
-            color: var(--text-main); 
-            border: 2px solid var(--border); 
-            margin-top: 10px; 
-            box-shadow: none;
-        }
+        .btn-outline { background: transparent; color: var(--text-main); border: 2px solid var(--border); margin-top: 10px; box-shadow: none; }
         
-        /* الجدول - حل مشكلة الحوسة */
-        .table-container { 
-            overflow-x: auto; /* يسمح بالسحب الأفقي */
-            border-radius: 10px; 
-            border: 1px solid var(--border); 
-            width: 100%;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            text-align: center; 
-            font-size: 0.9rem; 
-            background: var(--card); 
-            white-space: nowrap; /* يمنع الكلمة من النزول سطر جديد */
-        }
+        /* الجدول */
+        .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); width: 100%; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.9rem; background: var(--card); white-space: nowrap; }
         th, td { padding: 12px; border-bottom: 1px solid var(--border); }
         th { background: #f1f5f9; font-weight: 800; color: var(--text-muted); }
         
         /* المقارنة */
-        .comparison-result { 
-            margin-top: 15px; 
-            padding: 15px; 
-            background: #f0fdf4; 
-            border: 1px solid #bbf7d0;
-            border-radius: 12px; 
-            color: #166534; 
-            font-weight: 700; 
-            text-align: center; 
-            display: none; 
-            line-height: 1.6; 
-            font-size: 1rem;
-        }
+        .comparison-result { margin-top: 15px; padding: 15px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; color: #166534; font-weight: 700; text-align: center; display: none; line-height: 1.6; font-size: 1rem; }
         
         .footer { text-align: center; margin-top: 30px; padding: 15px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; }
         
-        /* تعديلات مخصصة للشاشات الصغيرة جداً */
         @media (max-width: 400px) {
             .grid-2 { grid-template-columns: 1fr; gap: 10px; }
             .header { justify-content: center; text-align: center; }
@@ -204,9 +94,9 @@
             <div class="form-group">
                 <label id="lblOil">نوع الزيت</label>
                 <select id="oilType">
-                    <option value="ISO VG 32">ISO VG 32</option>
-                    <option value="ISO VG 46">ISO VG 46</option>
-                    <option value="ISO VG 68">ISO VG 68</option>
+                    <option value="Low Viscosity (VG 32)">Low Viscosity (خفيف)</option>
+                    <option value="Mid Viscosity (VG 46)">Mid Viscosity (متوسط)</option>
+                    <option value="High Viscosity (VG 68)">High Viscosity (ثقيل)</option>
                 </select>
             </div>
             <div class="form-group">
@@ -404,7 +294,7 @@
             tr.innerHTML = `<td>${log.displayId}</td><td>${log.oil}</td><td><span style="color:var(--danger); font-weight:bold;">${log.temp}</span></td><td>${log.strokes}</td><td>${log.time}</td><td><strong style="color:var(--primary); font-size:1.1rem;">${log.rate}</strong> ${rateText}</td>`;
             tbody.appendChild(tr);
 
-            const optionText = `${readText} ${log.displayId} (${log.oil} @ ${log.temp}°C)`;
+            const optionText = `${readText} ${log.displayId} (${log.oil.split(' ')[0]} @ ${log.temp}°C)`;
             comp1.innerHTML += `<option value="${log.rate}">${optionText}</option>`;
             comp2.innerHTML += `<option value="${log.rate}">${optionText}</option>`;
         });
