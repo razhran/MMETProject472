@@ -90,7 +90,7 @@ function generateFinalReport() {
     const currentVisc = parseFloat(document.getElementById('viscOut').innerText);
 
     if (volEff === 0 || currentVisc === 0) {
-        alert("يا رائد، لازم تحسب الكفاءة واللزوجة في الأدوات اللي فوق أول!");
+        alert("Please calculate both efficiency and viscosity before generating the report!");
         return;
     }
 
@@ -133,7 +133,7 @@ function addToLog() {
 
     // التأكد من وجود نتائج قبل الإضافة
     if (pressure === "0" || volEff === "0") {
-        alert("يا رائد، احسب النتائج فوق أول قبل ما تضيفها للسجل!");
+        alert("Calculate pressure and efficiency before adding to log!");
         return;
     }
 
