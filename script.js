@@ -153,29 +153,53 @@ function addToLog() {
 
 // وظيفة التصدير للاكسل (CSV)
 function exportToExcel() {
-    const table = document.getElementById("resultsTable");
-    let csv = [];
+    // نحدد الجدول (سواء في الرئيسية أو المتقدمة)
+    const table = document.getElementById("resultsTable") || document.getElementById("mainLogTable");
     
-    // جلب العناوين والصفوف
-    for (let i = 0; i < table.rows.length; i++) {
-        let row = [], cols = table.rows[i].querySelectorAll("td, th");
-        for (let j = 0; j < cols.length; j++) row.push(cols[j].innerText);
-        csv.push(csv.join(","));
+    if (!table || table.rows.length <= 1) {
+        alert("يا رائد، الجدول فاضي! سجل بيانات أول.");
+        return;
     }
 
-    // إنشاء ملف التحميل
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csv.join("\n");
-    const encodedUri = encodeURI(csvContent);
+    let csv = [];
+    for (let i = 0; i < table.rows.length; i++) {
+        let row = [];
+        let cols = table.rows[i].querySelectorAll("td, th");
+        for (let j = 0; j < cols.length; j++) {
+            // تنظيف النص وتغليفه عشان ما يتلخبط الإكسل
+            let data = cols[j].innerText.trim().replace(/,/g, "."); 
+            row.push(data);
+        }
+        csv.push(row.join(",")); 
+    }
+
+    // إضافة الـ BOM لضمان ظهور اللغة العربية صح (\uFEFF)
+    const csvContent = "\uFEFF" + csv.join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", "MMET472_Lab_Results.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
-function toggleMenu() {
-    const menu = document.getElementById('navMenu');
-    menu.classList.toggle('active');
+
+function copyToClipboard() {
+    const table = document.getElementById("resultsTable") || document.getElementById("mainLogTable");
+    const range = document.createRange();
+    range.selectNode(table);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    
+    try {
+        document.execCommand("copy");
+        alert("تم نسخ الجدول! روح للإكسل وسو لصق (Ctrl+V) مباشرة.");
+    } catch (err) {
+        alert("معليش، المتصفح رفض النسخ التلقائي.");
+    }
+    window.getSelection().removeAllRanges();
 }
 
 // HOME PAGE SCRIPTS

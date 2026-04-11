@@ -22,81 +22,98 @@
         </div>
     </header>
 
-    <main class="dashboard-grid">
-    <div class="card tool-card">
-        <div class="card-header">
-            <h3 class="lang" data-ar="إعدادات التجربة" data-en="Experiment Settings">إعدادات التجربة</h3>
-        </div>
-        <div class="card-body">
-            <div class="input-row">
-                <div class="input-field">
-                    <label class="lang" data-ar="اسم الزيت:" data-en="Oil Name:">اسم الزيت:</label>
+<main class="dashboard-container">
+    <div class="control-panel">
+        <div class="card settings-card">
+            <div class="card-header"><h4>⚙️ إعدادات التجربة</h4></div>
+            <div class="card-body">
+                <div class="input-group">
+                    <label>اسم الزيت:</label>
                     <select id="oilType">
                         <option value="ISO VG 32">ISO VG 32</option>
                         <option value="ISO VG 46">ISO VG 46</option>
                         <option value="ISO VG 68">ISO VG 68</option>
                     </select>
                 </div>
-                <div class="input-field">
-                    <label class="lang" data-ar="الحرارة (°C):" data-en="Temp (°C):">الحرارة (°C):</label>
+                <div class="input-group">
+                    <label>الحرارة (°C):</label>
                     <input type="number" id="currentTemp" value="25">
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card tool-card">
-        <div class="card-header">
-            <h3 class="lang" data-ar="المؤقت الرقمي" data-en="Digital Timer">المؤقت الرقمي</h3>
+        <div class="card timer-card">
+            <div class="card-header"><h4>⏱️ المؤقت</h4></div>
+            <div class="card-body">
+                <div id="timerDisplay">00:00.00</div>
+                <div class="control-btns">
+                    <button class="btn-start" onclick="startTimer()">Start</button>
+                    <button class="btn-stop" onclick="stopTimer()">Stop</button>
+                    <button class="btn-reset" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
         </div>
-        <div class="card-body text-center">
-            <div id="timerDisplay" class="timer-font">00:00.00</div>
-            <div class="timer-actions">
-                <button class="btn-start" onclick="startTimer()">Start</button>
-                <button class="btn-stop" onclick="stopTimer()">Stop</button>
-                <button class="btn-reset-small" onclick="resetTimer()">Reset</button>
+
+        <div class="card counter-card">
+            <div class="card-header"><h4>🔢 العداد</h4></div>
+            <div class="card-body">
+                <div id="strokeDisplay">0</div>
+                <button class="btn-plus" onclick="addStroke()">+1 Stroke</button>
+                <button class="btn-reset-link" onclick="resetCounter()">Reset Count</button>
             </div>
         </div>
     </div>
 
-    <div class="card tool-card">
-    <div class="card-header">
-        <h3 class="lang" data-ar="عداد الضغطات" data-en="Stroke Counter">عداد الضغطات</h3>
-    </div>
-    <div class="card-body text-center">
-        <div id="strokeDisplay" class="counter-font">0</div>
-        
-        <div class="counter-actions">
-            <button class="action-btn count-up" onclick="addStroke()">+1 Stroke</button>
-            <button class="action-btn reset-gray" onclick="resetCounter()">Reset</button>
-        </div>
-    </div>
-</div>
-
-    <div class="card table-card full-width">
+    <div class="card log-card">
         <div class="card-header">
-            <h3 class="lang" data-ar="سجل البيانات" data-en="Data Log">سجل البيانات</h3>
-            <button class="export-excel-btn" onclick="exportToExcel()">Export to Excel</button>
+            <h4>📋 سجل البيانات الميدانية</h4>
+            <div class="table-actions">
+                <button class="btn-copy" onclick="copyTable()">📋 نسخ لللصق</button>
+                <button class="btn-excel" onclick="exportToExcel()">📊 Export Excel</button>
+            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table id="mainLogTable">
                     <thead>
                         <tr>
-                            <th class="lang" data-ar="الزيت" data-en="Oil">الزيت</th>
-                            <th class="lang" data-ar="الضخات" data-en="Strokes">الضخات</th>
-                            <th class="lang" data-ar="الزمن" data-en="Time">الزمن</th>
-                            <th class="lang" data-ar="الحرارة" data-en="Temp">الحرارة</th>
-                            <th class="lang" data-ar="معدل التدفق" data-en="Flow Rate">معدل التدفق</th>
+                            <th>الزيت</th>
+                            <th>الضخات</th>
+                            <th>الزمن</th>
+                            <th>الحرارة</th>
+                            <th>معدل التدفق</th>
                         </tr>
                     </thead>
                     <tbody id="logBody"></tbody>
                 </table>
             </div>
-            <button class="save-btn-large" onclick="saveToLog()">حفظ القراءة الحالية</button>
+            <button class="btn-save-main" onclick="saveToLog()">💾 حفظ القراءة الحالية في السجل</button>
         </div>
     </div>
 </main>
+
+<script> 
+function copyTable() {
+    const table = document.getElementById("mainLogTable");
+    if (table.rows.length <= 1) {
+        alert("سجل بيانات أول عشان ننسخها!");
+        return;
+    }
+
+    const range = document.createRange();
+    range.selectNode(table);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    
+    try {
+        document.execCommand("copy");
+        alert("✅ تم نسخ الجدول! روح للإكسل وسو Paste (Ctrl+V) مباشرة.");
+    } catch (err) {
+        alert("❌ المتصفح رفض النسخ التلقائي.");
+    }
+    window.getSelection().removeAllRanges();
+}
+</script>
 
     <footer class="main-footer">
         <p class="lang" data-ar="تم إنشاء الأدوات لمشروع تأثير لزوجة الزيت 2026" data-en="Oil Viscosity Project 2026">تم إنشاء الأدوات لمشروع تأثير لزوجة الزيت 2026</p>
