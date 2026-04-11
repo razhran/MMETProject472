@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="mainBody">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMET 472 - Pro Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="ar">
+    <div class="app-wrapper">
+<header class="main-header">
+    <div class="header-content">
+        <div class="logo-area">
+            <h2 class="lang" data-ar="مختبر الهيدروليك" data-en="Hydraulic Lab">مختبر الهيدروليك</h2>
+            <span class="project-tag">MMET 472</span>
+        </div>
+
+        <nav class="nav-menu" id="navMenu">
+            <a href="index.html" class="nav-link lang" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
+            <a href="advanced.html" class="nav-link lang" data-ar="التحليل المتقدم" data-en="Advanced Analysis">التحليل المتقدم</a>
+            <button class="lang-toggle" onclick="toggleLang()">EN / AR</button>
+        </nav>
+
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</header>
+
+        <main class="dashboard-grid">
+            <div class="card tool-card">
+                <div class="card-header">
+                    <div class="icon-circle">1</div>
+                    <h3 class="lang" data-ar="أداة الضغط التشغيلي" data-en="Operating Pressure Tool">أداة الضغط التشغيلي</h3>
+                </div>
+                <div class="card-body">
+                    <div class="input-row">
+                        <div class="input-field">
+                            <label class="lang" data-ar="الكتلة (kg):" data-en="Load Mass (kg):">الكتلة (kg):</label>
+                            <input type="number" id="mass" value="5000">
+                        </div>
+                        <div class="input-field">
+                            <label class="lang" data-ar="قطر البستم (mm):" data-en="Piston Dia (mm):">قطر البستم (mm):</label>
+                            <input type="number" id="pistonD" value="30">
+                        </div>
+                    </div>
+                    <button class="primary-btn lang" onclick="calculatePressure()" data-ar="توليد الضغط" data-en="Generate Pressure">توليد الضغط</button>
+                    <div class="result-box">
+                        <span class="label lang" data-ar="الضغط المحسوب:" data-en="Calculated Pressure:">الضغط المحسوب:</span>
+                        <div class="value-display"><span id="pressureOut">0</span> <small>Bar</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card tool-card">
+                <div class="card-header">
+                    <div class="icon-circle secondary">2</div>
+                    <h3 class="lang" data-ar="تحليل الكفاءة والفقد" data-en="Efficiency & Loss Analysis">تحليل الكفاءة والفقد</h3>
+                </div>
+                <div class="card-body">
+                    <div class="input-row">
+                        <div class="input-field">
+                            <label class="lang" data-ar="عدد الضغطات:" data-en="Strokes Count:">عدد الضغطات:</label>
+                            <input type="number" id="strokes" placeholder="10">
+                        </div>
+                        <div class="input-field">
+                            <label class="lang" data-ar="الارتفاع المحقق (mm):" data-en="Actual Lift (mm):">الارتفاع المحقق (mm):</label>
+                            <input type="number" id="hActual">
+                        </div>
+                    </div>
+                    <button class="primary-btn secondary lang" onclick="calculateEfficiency()" data-ar="تحليل الكفاءة" data-en="Analyze Efficiency">تحليل الكفاءة</button>
+                    <div class="result-box status-bg" id="resBg">
+                        <span class="label lang" data-ar="كفاءة الزيت الحجمية:" data-en="Oil Volumetric Efficiency:">كفاءة الزيت الحجمية:</span>
+                        <div class="value-display"><span id="effOut">0</span> %</div>
+                        <p id="leakageStatus" class="status-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card tool-card highlight-card">
+    <div class="card-header">
+        <div class="icon-circle accent">3</div>
+        <h3 class="lang" data-ar="محلل اللزوجة والحرارة" data-en="Viscosity & Temp Analyzer">محلل اللزوجة والحرارة</h3>
+    </div>
+    <div class="card-body">
+        <div class="input-row">
+            <div class="input-field">
+                <label class="lang" data-ar="نوع الزيت (ISO VG):" data-en="Oil Type (ISO VG):">نوع الزيت (ISO VG):</label>
+                <select id="oilType">
+                    <option value="32">ISO VG 32</option>
+                    <option value="46" selected>ISO VG 46</option>
+                    <option value="68">ISO VG 68</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label class="lang" data-ar="الحرارة المقاسة (°C):" data-en="Measured Temp (°C):">الحرارة المقاسة (°C):</label>
+                <input type="number" id="tempC" placeholder="مثلاً 40">
+            </div>
+        </div>
+        <button class="primary-btn accent-btn lang" onclick="analyzeViscosity()" data-ar="توقع اللزوجة" data-en="Predict Viscosity">توقع اللزوجة</button>
+        
+        <div class="viscosity-display">
+            <div class="visc-metric">
+                <span class="lang" data-ar="اللزوجة المتوقعة:" data-en="Estimated Viscosity:">اللزوجة المتوقعة:</span>
+                <div class="value"><span id="viscOut">0</span> <small>cSt</small></div>
+            </div>
+            <p id="viscWarning" class="warning-text"></p>
+        </div>
+    </div>
+</div>
+
+<div class="card tool-card final-summary">
+    <div class="card-header">
+        <div class="icon-circle success">4</div>
+        <h3 class="lang" data-ar="ملخص الكفاءة الكلية" data-en="Overall Efficiency Summary">ملخص الكفاءة الكلية</h3>
+    </div>
+    <div class="card-body">
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="lang" data-ar="حالة النظام:" data-en="System Status:">حالة النظام:</span>
+                <div id="finalStatus" class="status-badge">---</div>
+            </div>
+            <div class="summary-item">
+                <span class="lang" data-ar="الكفاءة الكلية المتوقعة:" data-en="Overall Efficiency:">الكفاءة الكلية المتوقعة:</span>
+                <div class="final-value"><span id="overallEffOut">0</span> %</div>
+            </div>
+        </div>
+        <button class="primary-btn success-btn lang" onclick="generateFinalReport()" data-ar="تحديث الملخص النهائي" data-en="Update Final Summary">تحديث الملخص النهائي</button>
+        
+        <div class="report-tip">
+            <p class="lang" 
+               [cite_start]data-ar="💡 نصيحة للتقرير: هذه النتيجة تمثل التوازن بين لزوجة الزيت ومنع التسريب الداخلي بناءً على البحث[cite: 1]." 
+               [cite_start]data-en="💡 Report Tip: This result represents the balance between oil viscosity and leakage prevention based on[cite: 1].">
+               💡 نصيحة للتقرير: هذه النتيجة تمثل التوازن بين لزوجة الزيت ومنع التسريب الداخلي بناءً على البحث[cite: 1].
+            </p>
+        </div>
+    </div>
+</div>
+
+<section class="card table-card">
+    <div class="card-header">
+        <div class="icon-circle log-icon">📋</div>
+        <h3 class="lang" data-ar="سجل تجارب المختبر" data-en="Lab Experiment Log">سجل تجارب المختبر</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-actions">
+            <button class="primary-btn log-btn lang" onclick="addToLog()" data-ar="إضافة النتائج للسجل" data-en="Add Results to Log">إضافة النتائج للسجل</button>
+            <button class="primary-btn export-btn lang" onclick="exportToExcel()" data-ar="تصدير إلى Excel" data-en="Export to Excel">تصدير إلى Excel</button>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th class="lang" data-ar="نوع الزيت" data-en="Oil Type">نوع الزيت</th>
+                        <th class="lang" data-ar="الحرارة (°C)" data-en="Temp (°C)">الحرارة (°C)</th>
+                        <th class="lang" data-ar="الحمل (kg)" data-en="Load (kg)">الحمل (kg)</th>
+                        <th class="lang" data-ar="الضغط (Bar)" data-en="Pressure (Bar)">الضغط (Bar)</th>
+                        <th class="lang" data-ar="اللزوجة (cSt)" data-en="Viscosity (cSt)">اللزوجة (cSt)</th>
+                        <th class="lang" data-ar="الكفاءة الحجمية (%)" data-en="Vol. Efficiency (%)">الكفاءة الحجمية (%)</th>
+                        <th class="lang" data-ar="الكفاءة الكلية (%)" data-en="Overall Eff (%)">الكفاءة الكلية (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="card sources-card">
+    <div class="card-header">
+        <div class="icon-circle info-icon">📚</div>
+        <h3 class="lang" data-ar="المراجع العلمية والمنهجية" data-en="Scientific References & Methodology">المراجع العلمية والمنهجية</h3>
+    </div>
+    <div class="card-body">
+        <div class="sources-container">
+            <a href="#" class="source-link">
+                <div class="source-head">
+                    <strong class="lang" data-ar="1. دراسة الفقد الحجمي (Gdańsk University)" data-en="1. Volumetric Loss Study (Gdańsk University)">1. دراسة الفقد الحجمي (Gdańsk University)</strong>
+                    <span class="tag">PDF</span>
+                </div>
+                <div class="source-benefit">
+                    <p class="lang" 
+                       data-ar="الفائدة: المرجع الأساسي لحساب 'التهريب الداخلي' (Internal Leakage). بسببه عرفنا إن لزوجة الزيت الضعيفة تزيد الفقد الحجمي طردياً مع الضغط التشغيلي." 
+                       data-en="Benefit: Primary reference for 'Internal Leakage' calculations. It helped define how low viscosity increases volumetric loss relative to operating pressure.">
+                       الفائدة: المرجع الأساسي لحساب 'التهريب الداخلي' (Internal Leakage). بسببه عرفنا إن لزوجة الزيت الضعيفة تزيد الفقد الحجمي طردياً مع الضغط التشغيلي.
+                    </p>
+                </div>
+            </a>
+
+            <a href="#" class="source-link">
+                <div class="source-head">
+                    <strong class="lang" data-ar="2. طرق تحديد مؤشر اللزوجة (IJST 2023)" data-en="2. Viscosity Index Methods (IJST 2023)">2. طرق تحديد مؤشر اللزوجة (IJST 2023)</strong>
+                    <span class="tag">Research</span>
+                </div>
+                <div class="source-benefit">
+                    <p class="lang" 
+                       data-ar="الفائدة: اعتمدنا عليه في برمجة 'محرك الحرارة'. البحث وضح كيف تنهار جزيئات الزيت وتفقد لزوجتها عند درجات الحرارة العالية، مما يسبب فشل التزييت." 
+                       data-en="Benefit: Used for the 'Heat Engine' logic. It explained how oil molecules degrade and lose viscosity at high temperatures, leading to lubrication failure.">
+                       الفائدة: اعتمدنا عليه في برمجة 'محرك الحرارة'. البحث وضح كيف تنهار جزيئات الزيت وتفقد لزوجتها عند درجات الحرارة العالية، مما يسبب فشل التزييت.
+                    </p>
+                </div>
+            </a>
+
+            <a href="#" class="source-link">
+                <div class="source-head">
+                    <strong class="lang" data-ar="3. عوامل أداء الزيوت الهيدروليكية (IOP)" data-en="3. Hydraulic Oil Performance Factors (IOP)">3. عوامل أداء الزيوت الهيدروليكية (IOP)</strong>
+                    <span class="tag">Conference</span>
+                </div>
+                <div class="source-benefit">
+                    <p class="lang" 
+                       data-ar="الفائدة: من هنا استنبطنا موازنة 'الكفاءة الكلية'. ساعدنا نفهم إن الزيت الثقيل جداً يقلل الكفاءة الميكانيكية بسبب زيادة الاحتكاك داخل الجاك." 
+                       data-en="Benefit: Basis for 'Overall Efficiency' balance. It helped us understand that high viscosity oil reduces mechanical efficiency due to increased friction inside the jack.">
+                       الفائدة: من هنا استنبطنا موازنة 'الكفاءة الكلية'. ساعدنا نفهم إن الزيت الثقيل جداً يقلل الكفاءة الميكانيكية بسبب زيادة الاحتكاك داخل الجاك.
+                    </p>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+<footer class="main-footer">
+    <div class="footer-content">
+        <p class="lang" 
+           data-ar="تم إنشاء الأدوات لمشروع تأثير لزوجة الزيت 2026" 
+           data-en="Tools created for the Oil Viscosity Effect Project 2026">
+           تم إنشاء الأدوات لمشروع تأثير لزوجة الزيت 2026
+        </p>
+        <div class="project-code">MMET472 Project</div>
+    </div>
+</footer>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
