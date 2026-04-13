@@ -28,42 +28,164 @@ body.ar { direction: rtl; }
     margin: 0 auto; /* يخلي المحتوى في النص */
 }
 
-/* --- الهيدر المستجيب (Responsive Header) --- */
-.header-content {
+/* الهيدر الأساسي */
+.main-header {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    direction: rtl;
+}
+
+.nav-container {
     max-width: 1200px;
-    margin: auto;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 70px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.nav-menu { display: flex; gap: 20px; align-items: center; }
-
-.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-.hamburger span { width: 25px; height: 3px; background: var(--primary); border-radius: 2px; }
-
-/* --- الجوال (Mobile) --- */
-@media (max-width: 768px) {
-    .dashboard-grid { grid-template-columns: 1fr; } /* أداة واحدة في الصف */
-    
-    .hamburger { display: flex; } /* إظهار الثلاث خطوط */
-    
-    .nav-menu {
-        display: none; /* إخفاء القائمة افتراضياً */
-        position: absolute; top: 70px; left: 0; width: 100%;
-        background: white; flex-direction: column; padding: 20px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 1000;
-    }
-    
-    .nav-menu.active { display: flex; } /* تظهر عند الضغط */
-    
-    .nav-link { width: 100%; text-align: center; padding: 15px; border-bottom: 1px solid #eee; }
+/* حل "مشكلة الأزرق": خليناه نص رمادي احترافي مع فاصل */
+.brand-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* --- اللوحي (Tablet) --- */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .nav-menu { display: flex; } /* الروابط ظاهرة */
-    .lang-toggle { display: inline-block; }
+.project-id {
+    color: #888;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-left: 2px solid #ddd; /* فاصل بسيط بدل البوكس الأزرق */
+    padding-left: 12px;
+}
+
+.page-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+}
+
+/* الروابط */
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-links a.active, .nav-links a:hover {
+    color: #1a73e8; /* أزرق خفيف بس للنص النشط */
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.lang-switch-btn {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #444;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-left: 10px;
+}
+
+.lang-switch-btn:hover {
+    background: #eee;
+    border-color: #bbb;
+}
+
+/* في الجوال، نخلي زر اللغة واضح بجنب الهمبرغر */
+@media (max-width: 768px) {
+    .nav-actions { gap: 10px; }
+    .lang-switch-btn { padding: 3px 8px; font-size: 0.75rem; }
+}
+
+/* شلنا البوكس الأزرق وخليناه خط فاصل رمادي أنيق */
+.project-id {
+    color: #888;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-left: 2px solid #ddd; 
+    padding-left: 12px;
+    margin-left: 5px;
+}
+
+/* في حالة الإنجليزي، نقلب الفاصل للجهة الثانية */
+[dir="ltr"] .project-id {
+    border-left: none;
+    border-right: 2px solid #ddd;
+    padding-left: 0;
+    padding-right: 12px;
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+.lang-switch-btn {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* زر الجوال */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.bar {
+    width: 22px;
+    height: 2px;
+    background: #333;
+}
+
+/* تنسيق الجوال */
+@media (max-width: 768px) {
+    .menu-toggle { display: flex; }
+
+    .nav-links {
+        display: none; /* مخفي */
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    /* هذا الكلاس اللي بيضيفه الـ JS عشان تظهر القائمة */
+    .nav-links.active {
+        display: flex;
+    }
 }
 
 /* Card Styling */

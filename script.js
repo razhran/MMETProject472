@@ -287,3 +287,38 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
 }
+
+function toggleLang() {
+    const htmlTag = document.documentElement;
+    const langBtn = document.getElementById('lang-btn');
+    const langElements = document.querySelectorAll('.lang');
+    
+    // تحديد اللغة الجديدة
+    const newLang = htmlTag.dir === 'rtl' ? 'en' : 'ar';
+    
+    // 1. تغيير اتجاه الصفحة (RTL/LTR)
+    htmlTag.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+    htmlTag.lang = newLang;
+
+    // 2. تحديث نص زر اللغة
+    langBtn.innerText = newLang === 'ar' ? 'EN' : 'AR';
+
+    // 3. تغيير كل النصوص اللي عندها كلاس lang في الموقع كامل
+    langElements.forEach(el => {
+        const text = el.getAttribute(`data-${newLang}`);
+        if (text) {
+            el.innerText = text;
+        }
+    });
+}
+
+// تشغيل المنيو (الهمبرغر)
+document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.getElementById('mobile-menu');
+    const navList = document.getElementById('nav-list');
+    if (menuBtn && navList) {
+        menuBtn.addEventListener('click', () => {
+            navList.classList.toggle('active');
+        });
+    }
+});

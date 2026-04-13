@@ -10,22 +10,30 @@
 <body class="ar">
     <div class="app-wrapper">
 <header class="main-header">
-    <div class="header-content">
-        <div class="logo-area">
-            <h2 class="lang" data-ar="الحسابات الهيدروليكية" data-en="Hydraulic Calculations">الحسابات الهيدروليكية</h2>
-            <span class="project-tag">MMET 472</span>
-        </div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand-area">
+                <span class="project-id lang" data-ar="MMET 472" data-en="MMET 472">MMET 472</span>
+                <h1 class="page-title lang" data-ar="الحسابات الهيدروليكية" data-en="Hydraulic Calculations">الحسابات الهيدروليكية</h1>
+            </div>
 
-        <nav class="nav-menu" id="navMenu">
-            <a href="index.html" class="nav-link lang" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
-            <a href="advanced.html" class="nav-link lang" data-ar="التحليل المتقدم" data-en="Advanced Analysis">التحليل المتقدم</a>
-            <button class="lang-toggle" onclick="toggleLang()">EN / AR</button>
-        </nav>
+            <div class="nav-actions">
+                <ul class="nav-links" id="nav-list">
+                    <li><a href="index.html" class="nav-link lang active" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                    <li><a href="advanced.html" class="nav-link lang" data-ar="التحليل المتقدم" data-en="Advanced Analysis">التحليل المتقدم</a></li>
+                    <li><a href="#sources" class="nav-link lang" data-ar="المصادر" data-en="Sources">المصادر</a></li>
+                </ul>
 
-        <div class="hamburger" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
+                <button id="lang-btn" class="lang-switch-btn" onclick="toggleLang()">EN</button>
+
+                <button class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
         </div>
-    </div>
+    </nav>
 </header>
 
         <main class="dashboard-grid">

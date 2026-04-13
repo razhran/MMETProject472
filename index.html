@@ -8,19 +8,32 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="ar">
-    <header class="main-header">
-        <div class="header-content">
-            <div class="logo-area">
-                <h2 class="lang" data-ar="مسجل بيانات التجربة" data-en="Exp. Data Logger">مسجل بيانات التجربة</h2>
+<header class="main-header">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand-area">
+                <span class="project-id lang" data-ar="MMET 472" data-en="MMET 472">MMET 472</span>
+                <h1 class="page-title lang" data-ar="القياسات العملية" data-en="lab Measurements">القياسات العملية</h1>
             </div>
-            <nav class="nav-menu" id="navMenu">
-                <a href="index.html" class="nav-link active lang" data-ar="الرئيسية" data-en="Home">الرئيسية</a>
-                <a href="advanced.html" class="nav-link lang" data-ar="التحليل المتقدم" data-en="Advanced">التحليل المتقدم</a>
-                <button class="lang-toggle" onclick="toggleLang()">EN / AR</button>
-            </nav>
-            <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+
+            <div class="nav-actions">
+                <ul class="nav-links" id="nav-list">
+                    <li><a href="index.html" class="nav-link lang active" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                    <li><a href="advanced.html" class="nav-link lang" data-ar="التحليل المتقدم" data-en="Advanced Analysis">التحليل المتقدم</a></li>
+                    <li><a href="#sources" class="nav-link lang" data-ar="المصادر" data-en="Sources">المصادر</a></li>
+                </ul>
+
+                <button id="lang-btn" class="lang-switch-btn" onclick="toggleLang()">EN</button>
+
+                <button class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
         </div>
-    </header>
+    </nav>
+</header>
 
 <main class="dashboard-container">
     <div class="control-panel">
