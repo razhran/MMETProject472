@@ -157,7 +157,7 @@ function exportToExcel() {
     const table = document.getElementById("resultsTable") || document.getElementById("mainLogTable");
     
     if (!table || table.rows.length <= 1) {
-        alert("يا رائد، الجدول فاضي! سجل بيانات أول.");
+        alert("sorry, no data to export! Please add some measurements to the log first.");
         return;
     }
 
@@ -195,9 +195,9 @@ function copyToClipboard() {
     
     try {
         document.execCommand("copy");
-        alert("تم نسخ الجدول! روح للإكسل وسو لصق (Ctrl+V) مباشرة.");
+        alert("copied to clipboard! You can now paste it into Excel or any text editor.");
     } catch (err) {
-        alert("معليش، المتصفح رفض النسخ التلقائي.");
+        alert("sorry, copying failed. Please try copying manually.");
     }
     window.getSelection().removeAllRanges();
 }
