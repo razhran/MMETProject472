@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Madkhal Backend — Complete Reference</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2128; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --brand: #0066cc; --accent: #58a6ff;
+    --green: #3fb950; --yellow: #d29922; --red: #f85149; --purple: #bc8cff;
+    --orange: #ffa657; --pink: #ff7b72;
+    --radius: 8px; --font-mono: 'SFMono-Regular', Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; }
+  body { background: var(--bg); color: var(--text); line-height: 1.6; }
+
+/* Layout */
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+width: 260px; flex-shrink: 0; background: var(–surface);
+border-left: 1px solid var(–border); padding: 24px 0;
+position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.sidebar h2 { font-size: 0.7rem; font-weight: 700; color: var(–muted); padding: 0 20px 8px; text-transform: uppercase; letter-spacing: 0.1em; }
+.sidebar a { display: block; padding: 6px 20px; font-size: 0.82rem; color: var(–muted); text-decoration: none; border-right: 2px solid transparent; transition: all 0.15s; }
+.sidebar a:hover { color: var(–text); background: var(–surface2); }
+.sidebar a.active { color: var(–accent); border-right-color: var(–accent); }
+.sidebar .section { margin-bottom: 20px; }
+
+.content { flex: 1; padding: 48px 56px; max-width: 900px; overflow-x: auto; }
+@media (max-width: 768px) { .sidebar { display: none; } .content { padding: 24px 20px; } }
+
+/* Typography */
+h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+h2 { font-size: 1.35rem; font-weight: 700; margin: 48px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(–border); color: var(–text); }
+h3 { font-size: 1rem; font-weight: 700; margin: 28px 0 10px; color: var(–accent); }
+h4 { font-size: 0.88rem; font-weight: 700; margin: 20px 0 8px; color: var(–orange); }
+p { margin-bottom: 12px; color: var(–muted); }
+p strong { color: var(–text); }
+ul, ol { margin: 8px 0 16px 20px; color: var(–muted); }
+li { margin-bottom: 4px; }
+li strong { color: var(–text); }
+a { color: var(–accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Code blocks */
+pre {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–radius); padding: 16px 20px; overflow-x: auto;
+font-family: var(–font-mono); font-size: 0.82rem; line-height: 1.65;
+margin: 12px 0 20px; position: relative;
+}
+code { font-family: var(–font-mono); font-size: 0.82rem; }
+p code, li code, td code {
+background: var(–surface2); border: 1px solid var(–border);
+border-radius: 4px; padding: 1px 6px; color: var(–pink); font-size: 0.8rem;
+}
+
+/* Syntax tokens */
+.kw  { color: var(–pink); }
+.fn  { color: var(–purple); }
+.str { color: var(–green); }
+.cmt { color: #484f58; font-style: italic; }
+.num { color: var(–orange); }
+.var { color: var(–accent); }
+.cls { color: var(–yellow); }
+.op  { color: var(–muted); }
+
+/* Badges */
+.badge {
+display: inline-block; padding: 2px 9px; border-radius: 99px;
+font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+}
+.badge-get    { background: #1f3a5f; color: #58a6ff; }
+.badge-post   { background: #1a3a2a; color: #3fb950; }
+.badge-patch  { background: #3a2a1a; color: var(–orange); }
+.badge-delete { background: #3a1a1a; color: var(–red); }
+.badge-public { background: #1f3a5f; color: #79c0ff; }
+.badge-club   { background: #2d1f5f; color: var(–purple); }
+.badge-editor { background: #1a3a1a; color: var(–green); }
+.badge-admin  { background: #3a1a2a; color: var(–pink); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 0.84rem; }
+th { background: var(–surface2); padding: 9px 14px; text-align: right; font-weight: 600; border: 1px solid var(–border); color: var(–text); }
+td { padding: 8px 14px; border: 1px solid var(–border); color: var(–muted); vertical-align: top; }
+tr:hover td { background: var(–surface2); }
+
+/* Callouts */
+.callout {
+border-radius: var(–radius); padding: 14px 16px; margin: 16px 0;
+border-right: 4px solid; font-size: 0.85rem;
+}
+.callout-warn  { background: #2d2000; border-color: var(–yellow); color: #e3b341; }
+.callout-info  { background: #001f3d; border-color: var(–accent); color: #79c0ff; }
+.callout-green { background: #001a10; border-color: var(–green); color: #56d364; }
+.callout-red   { background: #2d0000; border-color: var(–red); color: #f97583; }
+.callout strong { font-weight: 700; }
+
+/* Route cards */
+.route {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–radius); margin-bottom: 10px; overflow: hidden;
+}
+.route-header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(–surface2); }
+.route-path { font-family: var(–font-mono); font-size: 0.82rem; color: var(–text); }
+.route-desc { font-size: 0.78rem; color: var(–muted); margin-right: auto; }
+.route-body { padding: 10px 16px; font-size: 0.78rem; color: var(–muted); }
+
+/* Steps */
+.steps { counter-reset: step; }
+.step { display: flex; gap: 16px; margin-bottom: 24px; }
+.step-num {
+width: 32px; height: 32px; border-radius: 50%; background: var(–brand);
+color: white; display: flex; align-items: center; justify-content: center;
+font-weight: 700; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px;
+}
+.step-body { flex: 1; }
+.step-body h4 { margin-top: 0; }
+
+/* Copy button */
+.pre-wrap { position: relative; }
+.copy-btn {
+position: absolute; top: 8px; left: 10px;
+background: var(–surface2); border: 1px solid var(–border);
+color: var(–muted); padding: 3px 10px; border-radius: 5px;
+font-size: 0.7rem; cursor: pointer; font-family: inherit;
+transition: all 0.15s;
+}
+.copy-btn:hover { color: var(–text); border-color: var(–accent); }
+
+/* Hero */
+.hero { padding: 0 0 40px; border-bottom: 1px solid var(–border); margin-bottom: 12px; }
+.hero h1 { background: linear-gradient(90deg, #58a6ff, #bc8cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 1rem; color: var(–muted); margin-top: 8px; }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+/* Architecture diagram */
+.arch-diagram {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–radius); padding: 24px; font-family: var(–font-mono);
+font-size: 0.75rem; color: var(–muted); line-height: 2;
+margin: 16px 0;
+}
+.arch-diagram .box { color: var(–accent); }
+.arch-diagram .arrow { color: var(–green); }
+.arch-diagram .label { color: var(–yellow); }
+
+/* File tree */
+.tree { font-family: var(–font-mono); font-size: 0.8rem; line-height: 1.8; color: var(–muted); }
+.tree .dir  { color: var(–accent); font-weight: 600; }
+.tree .file { color: var(–text); }
+.tree .note { color: #484f58; }
+
+section { margin-bottom: 16px; }
+</style>
+
+</head>
+<body>
+<div class="layout">
+
+<!-- Sidebar -->
+
+<nav class="sidebar">
+  <div class="section">
+    <h2>البنية</h2>
+    <a href="#overview">نظرة عامة</a>
+    <a href="#structure">هيكل الملفات</a>
+    <a href="#architecture">خريطة النظام</a>
+  </div>
+  <div class="section">
+    <h2>قاعدة البيانات</h2>
+    <a href="#db-users">نموذج Users</a>
+    <a href="#db-news">نموذج News</a>
+    <a href="#db-events">نموذج Events</a>
+    <a href="#db-ads">نموذج Ads</a>
+    <a href="#db-missing">نموذج Missing</a>
+    <a href="#db-notifications">Notifications</a>
+    <a href="#db-audit">Audit Log</a>
+  </div>
+  <div class="section">
+    <h2>المتحكمات</h2>
+    <a href="#ctrl-auth">Auth Controller</a>
+    <a href="#ctrl-admin">Admin Controller</a>
+    <a href="#ctrl-news">News Controller</a>
+    <a href="#ctrl-cache">Cache Controller</a>
+  </div>
+  <div class="section">
+    <h2>Middleware</h2>
+    <a href="#mw-auth">auth.js</a>
+    <a href="#mw-rbac">RBAC System</a>
+    <a href="#mw-rate">Rate Limiter</a>
+    <a href="#mw-error">Error Handler</a>
+  </div>
+  <div class="section">
+    <h2>API Routes</h2>
+    <a href="#routes-auth">Auth Routes</a>
+    <a href="#routes-news">News Routes</a>
+    <a href="#routes-admin">Admin Routes</a>
+    <a href="#routes-cache">Cache/Sync Routes</a>
+  </div>
+  <div class="section">
+    <h2>Offline Sync</h2>
+    <a href="#offline-strategy">Strategy</a>
+    <a href="#offline-flow">Data Flow</a>
+  </div>
+  <div class="section">
+    <h2>التشغيل</h2>
+    <a href="#setup-local">Local Setup</a>
+    <a href="#setup-test">اختبار API</a>
+    <a href="#setup-deploy">Deploy Notes</a>
+  </div>
+</nav>
+
+<!-- Main content -->
+
+<main class="content">
+
+<!-- ══════════════════════════════════════════════ -->
+
+<div class="hero">
+  <h1>Madkhal Backend — التوثيق الكامل</h1>
+  <p>مرجع شامل لبنية الـ backend، نماذج البيانات، الـ RBAC، والـ offline sync</p>
+  <div class="hero-badges">
+    <span class="badge badge-get">Node.js 18+</span>
+    <span class="badge badge-post">Express 4</span>
+    <span class="badge badge-club">SQLite (WAL)</span>
+    <span class="badge badge-admin">JWT HS256</span>
+    <span class="badge badge-editor">bcrypt 12r</span>
+    <span class="badge badge-public">PWA Offline-First</span>
+  </div>
+</div>
+
+<!-- ══ OVERVIEW ════════════════════════════════════ -->
+
+<section id="overview">
+<h2>نظرة عامة على النظام</h2>
+<p>الـ backend مبني على <strong>Express + better-sqlite3</strong>. SQLite مناسب تماماً للحجم الحالي (آلاف المستخدمين) وسهل الصيانة — لا يحتاج server منفصل. يمكن الترحيل إلى PostgreSQL لاحقاً بتغيير طبقة الـ queries فقط.</p>
+
+<table>
+  <tr><th>طبقة</th><th>التقنية</th><th>الغرض</th></tr>
+  <tr><td>HTTP Server</td><td>Express 4</td><td>routing, middleware pipeline</td></tr>
+  <tr><td>Database</td><td>better-sqlite3</td><td>synchronous SQLite — سريع وآمن</td></tr>
+  <tr><td>Auth</td><td>JWT HS256 + bcrypt</td><td>access token (15m) + refresh token (7d)</td></tr>
+  <tr><td>File uploads</td><td>Multer + Cloudinary</td><td>صور المنشورات والإعلانات</td></tr>
+  <tr><td>Security</td><td>Helmet + HPP + rate-limit</td><td>14 HTTP headers + param pollution + rate limit</td></tr>
+  <tr><td>Offline sync</td><td>Cache snapshot API</td><td>يُغذّي الـ Service Worker في الـ PWA</td></tr>
+</table>
+</section>
+
+<!-- ══ FILE STRUCTURE ══════════════════════════════ -->
+
+<section id="structure">
+<h2>هيكل الملفات الكامل</h2>
+<div class="pre-wrap">
+<pre class="tree">
+<span class="dir">madkhal-rebuild/</span>
+├── <span class="dir">backend/</span>
+│   ├── <span class="file">.env.example</span>         <span class="note">← انسخه إلى .env وعدّل القيم</span>
+│   ├── <span class="file">package.json</span>
+│   ├── <span class="dir">data/</span>
+│   │   └── <span class="file">madkhal.db</span>       <span class="note">← يُنشأ تلقائياً عند أول تشغيل</span>
+│   ├── <span class="dir">uploads/</span>             <span class="note">← صور محلية (بديل Cloudinary)</span>
+│   └── <span class="dir">src/</span>
+│       ├── <span class="file">server.js</span>           <span class="note">← نقطة الدخول الرئيسية</span>
+│       ├── <span class="dir">config/</span>
+│       │   └── <span class="file">database.js</span>     <span class="note">← Schema + Seed + Cleanup</span>
+│       ├── <span class="dir">middleware/</span>
+│       │   ├── <span class="file">auth.js</span>         <span class="note">← JWT verify + RBAC guards</span>
+│       │   ├── <span class="file">rateLimiter.js</span>  <span class="note">← تحديد معدل الطلبات</span>
+│       │   └── <span class="file">errorHandler.js</span> <span class="note">← معالج الأخطاء المركزي</span>
+│       ├── <span class="dir">controllers/</span>
+│       │   ├── <span class="file">auth.controller.js</span>   <span class="note">← register/login/refresh/logout</span>
+│       │   ├── <span class="file">admin.controller.js</span>  <span class="note">← activate/users/stats/audit</span>
+│       │   ├── <span class="file">news.controller.js</span>   <span class="note">← CRUD + HTML sanitise</span>
+│       │   └── <span class="file">cache.controller.js</span>  <span class="note">← offline snapshot</span>
+│       ├── <span class="dir">routes/</span>
+│       │   ├── <span class="file">auth.routes.js</span>
+│       │   ├── <span class="file">admin.routes.js</span>
+│       │   ├── <span class="file">news.routes.js</span>
+│       │   ├── <span class="file">events.routes.js</span>
+│       │   ├── <span class="file">missing.routes.js</span>
+│       │   ├── <span class="file">ads.routes.js</span>
+│       │   └── <span class="file">cache.routes.js</span>
+│       └── <span class="dir">utils/</span>
+│           └── <span class="file">upload.js</span>       <span class="note">← Cloudinary أو local disk</span>
+└── <span class="dir">frontend/</span>
+    ├── <span class="file">sw.js</span>                <span class="note">← Service Worker</span>
+    └── <span class="dir">WebAppPage/</span>
+        ├── <span class="file">index.html</span>
+        ├── <span class="file">news.html</span>
+        ├── <span class="file">missing.html</span>
+        ├── <span class="file">plans.html</span>
+        ├── <span class="dir">Pages/</span>
+        │   └── <span class="file">clubs.html</span>
+        ├── <span class="dir">auth/</span>
+        │   └── <span class="file">gx9k2-portal.html</span>  <span class="note">← رابط الدخول المخفي</span>
+        ├── <span class="dir">admin/</span>
+        │   ├── <span class="file">dashboard.html</span>     <span class="note">← Super Admin</span>
+        │   └── <span class="file">club-dashboard.html</span>
+        ├── <span class="dir">css/</span>
+        │   └── <span class="file">main.css</span>
+        └── <span class="dir">js/</span>
+            ├── <span class="file">api.js</span>       <span class="note">← API client + offline fallback</span>
+            ├── <span class="file">app.js</span>       <span class="note">← shell: sidebar/theme/toasts/SW</span>
+            └── <span class="file">shell.js</span>     <span class="note">← injects shared HTML shell</span>
+</pre>
+</div>
+</section>
+
+<!-- ══ ARCHITECTURE ════════════════════════════════ -->
+
+<section id="architecture">
+<h2>خريطة النظام</h2>
+<div class="arch-diagram">
+<span class="box">[ PWA Frontend ]</span>
+       │
+       ├──<span class="arrow">─ api.js ──▶</span> <span class="label">GET /api/cache/snapshot</span>   <span class="cmt">// offline hydration</span>
+       ├──<span class="arrow">─ api.js ──▶</span> <span class="label">GET /api/news</span>              <span class="cmt">// public</span>
+       ├──<span class="arrow">─ api.js ──▶</span> <span class="label">POST /api/missing</span>          <span class="cmt">// public + rate-limited</span>
+       └──<span class="arrow">─ api.js ──▶</span> <span class="label">POST /portal-access-x9k2/login</span>
+
+<span class="box">[ Express Server ]</span>
+│
+├── helmet() + cors() + hpp() + compression()
+├── generalLimiter (200 req/15min)
+│
+├── <span class="label">PUBLIC routes</span>          <span class="cmt">// no JWT needed</span>
+│     GET /api/news, /api/events, /api/ads
+│     GET /api/cache/snapshot
+│     POST /api/missing
+│
+├── <span class="label">requireAuth()</span>          <span class="cmt">// verifyJWT → DB lookup → req.user</span>
+│     │
+│     ├── <span class="label">requireClub()</span>     <span class="cmt">// roles: club | editor | super_admin</span>
+│     │     POST /api/news
+│     │
+│     ├── <span class="label">requireEditor()</span>   <span class="cmt">// roles: editor | super_admin</span>
+│     │
+│     └── <span class="label">requireSuperAdmin()</span>  <span class="cmt">// role: super_admin ONLY</span>
+│           ALL /api/admin/*
+│           DELETE /api/news/:id
+│           POST /api/events, /api/ads
+│
+└── <span class="box">[ SQLite DB ]</span>
+users · news · events · missing_items
+ads · notifications · refresh_tokens · audit_log
+
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="db-users">📊 نماذج قاعدة البيانات</h2>
+
+<h3 id="db-users">جدول users — مع حقل is_active للبوابة اليدوية</h3>
+<div class="callout callout-info">
+  <strong>is_active:</strong> عندما يسجّل مستخدم جديد يُحفظ بـ <code>is_active = 0</code> و <code>role = 'pending'</code>. لا يمكنه الدخول حتى يُغيّر المدير الرئيسي هذا الحقل يدوياً عبر PATCH /api/admin/users/:id/activate.
+</div>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">users</span> (
+  <span class="var">id</span>           <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,                      <span class="cmt">-- UUID v4</span>
+  <span class="var">username</span>     <span class="cls">TEXT</span>    <span class="kw">NOT NULL UNIQUE</span>  <span class="kw">COLLATE</span> NOCASE, <span class="cmt">-- case-insensitive</span>
+  <span class="var">email</span>        <span class="cls">TEXT</span>    <span class="kw">NOT NULL UNIQUE</span>  <span class="kw">COLLATE</span> NOCASE,
+  <span class="var">password</span>     <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,                          <span class="cmt">-- bcrypt hash, 12 rounds</span>
+
+<span class="var">role</span>         <span class="cls">TEXT</span>    <span class="kw">NOT NULL DEFAULT</span> <span class="str">‘pending’</span>
+<span class="kw">CHECK</span>(role <span class="kw">IN</span> (<span class="str">‘pending’</span>,<span class="str">‘club’</span>,<span class="str">‘editor’</span>,<span class="str">‘super_admin’</span>)),
+
+<span class="cmt">– ▼▼▼ ACTIVATION GATE — المفتاح الرئيسي للنظام ▼▼▼</span>
+<span class="var">is_active</span>    <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,              <span class="cmt">– 0=pending, 1=active</span>
+<span class="cmt">– ▲▲▲ يتغير فقط بواسطة المدير الرئيسي ▲▲▲</span>
+
+<span class="var">club_name</span>    <span class="cls">TEXT</span>,                                      <span class="cmt">– اسم النادي للعرض</span>
+<span class="var">club_id</span>      <span class="cls">TEXT</span>,                                      <span class="cmt">– ID للفلترة (sports, tech…)</span>
+<span class="var">login_count</span>  <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,              <span class="cmt">– إحصائية</span>
+<span class="var">last_login</span>   <span class="cls">TEXT</span>,
+<span class="var">created_at</span>   <span class="cls">TEXT</span>    <span class="kw">NOT NULL DEFAULT</span> (strftime(<span class="str">’%Y-%m-%dT%H:%M:%SZ’</span>,<span class="str">‘now’</span>)),
+<span class="var">updated_at</span>   <span class="cls">TEXT</span>    <span class="kw">NOT NULL DEFAULT</span> (strftime(<span class="str">’%Y-%m-%dT%H:%M:%SZ’</span>,<span class="str">‘now’</span>))
+);</pre>
+
+<h4>دورة حياة المستخدم (State Machine)</h4>
+<pre>
+  Registration ──▶  { role: 'pending', is_active: 0 }
+                            │
+              PATCH /admin/users/:id/activate
+              (super_admin ONLY — Raed)
+                            │
+              ┌─────────────┼─────────────┐
+              ▼             ▼             ▼
+        { role: 'club'  { role: 'editor' { role: 'super_admin'
+          is_active: 1 }  is_active: 1 }  is_active: 1 }
+              │
+   PATCH /admin/users/:id/deactivate  ──▶  { is_active: 0 }
+   (immediate: all refresh tokens revoked)
+</pre>
+
+<h3 id="db-news">جدول news</h3>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">news</span> (
+  <span class="var">id</span>           <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+  <span class="var">title</span>        <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">body</span>         <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,                          <span class="cmt">-- sanitised HTML</span>
+  <span class="var">image_url</span>    <span class="cls">TEXT</span>,                                      <span class="cmt">-- Cloudinary URL or local path</span>
+  <span class="var">author_id</span>    <span class="cls">TEXT</span>    <span class="kw">NOT NULL REFERENCES</span> users(id) <span class="kw">ON DELETE CASCADE</span>,
+  <span class="var">author_name</span>  <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,                          <span class="cmt">-- club_name أو username</span>
+  <span class="var">category</span>     <span class="cls">TEXT</span>    <span class="kw">NOT NULL DEFAULT</span> <span class="str">'general'</span>
+               <span class="kw">CHECK</span>(category <span class="kw">IN</span> (<span class="str">'general'</span>,<span class="str">'club'</span>,<span class="str">'offer'</span>)),
+  <span class="var">club_id</span>      <span class="cls">TEXT</span>,                                      <span class="cmt">-- مقيّد لـ category='club'</span>
+  <span class="var">is_published</span> <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">1</span>,
+  <span class="var">views</span>        <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,
+  <span class="var">created_at</span>   <span class="cls">TEXT</span>,
+  <span class="var">updated_at</span>   <span class="cls">TEXT</span>
+);
+
+<span class="cmt">– RBAC rule enforced in news.controller.js:</span>
+<span class="cmt">– IF user.role === ‘club’ THEN category = ‘club’ (hard-coded, cannot override)</span></pre>
+
+<h3 id="db-events">جدول events</h3>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">events</span> (
+  <span class="var">id</span>           <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+  <span class="var">title</span>        <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">description</span>  <span class="cls">TEXT</span>,
+  <span class="var">location</span>     <span class="cls">TEXT</span>,
+  <span class="var">event_date</span>   <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,                          <span class="cmt">-- ISO 8601</span>
+  <span class="var">end_date</span>     <span class="cls">TEXT</span>,
+  <span class="var">image_url</span>    <span class="cls">TEXT</span>,
+  <span class="var">author_id</span>    <span class="cls">TEXT</span>    <span class="kw">NOT NULL REFERENCES</span> users(id) <span class="kw">ON DELETE CASCADE</span>,
+  <span class="var">is_published</span> <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">1</span>,
+  <span class="var">created_at</span>   <span class="cls">TEXT</span>, <span class="var">updated_at</span> <span class="cls">TEXT</span>
+);
+<span class="cmt">-- POST/DELETE: super_admin ONLY</span></pre>
+
+<h3 id="db-ads">جدول ads — مع جدولة زمنية</h3>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">ads</span> (
+  <span class="var">id</span>          <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+  <span class="var">title</span>       <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">content</span>     <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">image_url</span>   <span class="cls">TEXT</span>,
+  <span class="var">link_url</span>    <span class="cls">TEXT</span>,
+  <span class="var">placement</span>   <span class="cls">TEXT</span>    <span class="kw">CHECK</span>(placement <span class="kw">IN</span> (<span class="str">'inline'</span>,<span class="str">'banner'</span>,<span class="str">'popup'</span>)),
+
+<span class="cmt">– ▼▼▼ SCHEDULING SYSTEM — وقت البدء والانتهاء ▼▼▼</span>
+<span class="var">start_at</span>    <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,   <span class="cmt">– ISO 8601: ‘2026-06-01T08:00:00Z’</span>
+<span class="var">end_at</span>      <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,   <span class="cmt">– ISO 8601: ‘2026-06-30T23:59:00Z’</span>
+<span class="var">is_active</span>   <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">1</span>,  <span class="cmt">– يمكن إيقافه يدوياً</span>
+<span class="cmt">– ▲▲▲ GET /api/ads يرجع فقط: is_active=1 AND now BETWEEN start_at AND end_at ▲▲▲</span>
+
+<span class="var">author_id</span>   <span class="cls">TEXT</span>    <span class="kw">REFERENCES</span> users(id),
+<span class="var">created_at</span>  <span class="cls">TEXT</span>, <span class="var">updated_at</span> <span class="cls">TEXT</span>
+);</pre>
+
+<h3 id="db-missing">جدول missing_items — نظام المفقودات</h3>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">missing_items</span> (
+  <span class="var">id</span>          <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+  <span class="var">type</span>        <span class="cls">TEXT</span>    <span class="kw">NOT NULL CHECK</span>(type <span class="kw">IN</span> (<span class="str">'lost'</span>,<span class="str">'found'</span>)),
+  <span class="var">item_name</span>   <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">description</span> <span class="cls">TEXT</span>, <span class="var">location</span> <span class="cls">TEXT</span>, <span class="var">contact</span> <span class="cls">TEXT</span>, <span class="var">image_url</span> <span class="cls">TEXT</span>,
+  <span class="var">submitter</span>   <span class="cls">TEXT</span>,
+  <span class="var">is_resolved</span> <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,
+  <span class="var">is_approved</span> <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> <span class="num">0</span>,  <span class="cmt">-- مراجعة قبل النشر</span>
+  <span class="var">ip_hash</span>     <span class="cls">TEXT</span>,                                <span class="cmt">-- SHA256 لأول 16 رمز (anti-spam)</span>
+  <span class="var">created_at</span>  <span class="cls">TEXT</span>
+);</pre>
+
+<h3 id="db-notifications">جدول notifications</h3>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">notifications</span> (
+  <span class="var">id</span>          <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+  <span class="var">title</span>       <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">body</span>        <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,
+  <span class="var">icon</span>        <span class="cls">TEXT</span>    <span class="kw">NOT NULL DEFAULT</span> <span class="str">'📢'</span>,
+  <span class="var">target_role</span> <span class="cls">TEXT</span>    <span class="kw">NOT NULL DEFAULT</span> <span class="str">'all'</span>,
+  <span class="cmt">-- target_role: 'all' | 'club' | 'editor' | 'super_admin'</span>
+  <span class="var">author_id</span>   <span class="cls">TEXT</span>    <span class="kw">REFERENCES</span> users(id) <span class="kw">ON DELETE SET NULL</span>,
+  <span class="var">created_at</span>  <span class="cls">TEXT</span>
+);</pre>
+
+<h3 id="db-audit">جدول audit_log — سجل التدقيق</h3>
+<pre><span class="kw">CREATE TABLE</span> <span class="cls">audit_log</span> (
+  <span class="var">id</span>          <span class="cls">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+  <span class="var">actor_id</span>    <span class="cls">TEXT</span>    <span class="kw">REFERENCES</span> users(id) <span class="kw">ON DELETE SET NULL</span>,
+  <span class="var">action</span>      <span class="cls">TEXT</span>    <span class="kw">NOT NULL</span>,   <span class="cmt">-- 'LOGIN', 'ACTIVATE_USER', 'DELETE_NEWS'…</span>
+  <span class="var">entity</span>      <span class="cls">TEXT</span>,               <span class="cmt">-- 'users', 'news', 'ads'…</span>
+  <span class="var">entity_id</span>   <span class="cls">TEXT</span>,
+  <span class="var">detail</span>      <span class="cls">TEXT</span>,               <span class="cmt">-- JSON string</span>
+  <span class="var">ip_address</span>  <span class="cls">TEXT</span>,
+  <span class="var">created_at</span>  <span class="cls">TEXT</span>
+);
+<span class="cmt">-- يُمسح تلقائياً بعد 90 يوم (scheduleCleanup في database.js)</span></pre>
+
+<!-- ══ MIDDLEWARE ══════════════════════════════════ -->
+
+<h2 id="mw-auth">Middleware — auth.js</h2>
+<p>يحتوي على ثلاثة أجزاء: إنشاء التوكن، التحقق منه، وحراسة الأدوار.</p>
+
+<h3>دالة requireAuth()</h3>
+<pre><span class="cmt">// تسلسل التحقق:</span>
+<span class="num">1</span>. استخراج <span class="str">'Bearer TOKEN'</span> من Authorization header
+<span class="num">2</span>. jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] })
+   → TokenExpiredError  ──▶  401 { code: 'TOKEN_EXPIRED' }   <span class="cmt">// api.js يعيد المحاولة بـ refreshToken</span>
+   → JsonWebTokenError  ──▶  401 { code: 'TOKEN_INVALID' }
+<span class="num">3</span>. <span class="kw">SELECT FROM</span> users <span class="kw">WHERE</span> id = payload.id
+   → user not found     ──▶  401 { code: 'USER_NOT_FOUND' }
+   → is_active === 0    ──▶  403 { code: 'ACCOUNT_INACTIVE' }   <span class="cmt">// لحظي عند التعطيل</span>
+<span class="num">4</span>. req.user = { id, username, role, club_name, club_id }
+   next()</pre>
+
+<h3 id="mw-rbac">نظام RBAC — طبقات الصلاحيات</h3>
+<div class="callout callout-green">
+  <strong>المبدأ:</strong> كل route تُطبّق عليها صلاحية بشكل صريح في ملف الـ route. لا يوجد "وضع افتراضي آمن" — كل طلب يجب أن يمر بـ guard صريح.
+</div>
+<pre><span class="cmt">// RBAC Hierarchy</span>
+<span class="kw">super_admin</span>  ←──  أعلى صلاحية (رائد الزهراني)
+     ↑
+<span class="kw">editor</span>       ←──  يمكنه نشر كل أنواع المحتوى
+     ↑
+<span class="kw">club</span>         ←──  يمكنه نشر أخبار نادية فقط (category='club')
+     ↑
+<span class="kw">pending</span>      ←──  لا يملك أي صلاحية حتى التفعيل
+
+<span class="cmt">// Guards المتاحة:</span>
+<span class="fn">requireAuth()</span>          <span class="cmt">// أي access token صالح</span>
+<span class="fn">requireClub()</span>          <span class="cmt">// club | editor | super_admin</span>
+<span class="fn">requireEditor()</span>        <span class="cmt">// editor | super_admin</span>
+<span class="fn">requireSuperAdmin()</span>    <span class="cmt">// super_admin ONLY</span>
+<span class="fn">requireRole(…roles)</span>  <span class="cmt">// factory — أي تركيبة مخصصة</span></pre>
+
+<h4>Club RBAC Enforcement في news.controller.js</h4>
+<pre><span class="kw">if</span> (user.role === <span class="str">'club'</span>) {
+  category   = <span class="str">'club'</span>;          <span class="cmt">// مقيّد — لا يمكن تغييره من الطلب</span>
+  club_id    = user.club_id;    <span class="cmt">// ناديه فقط — لا يمكن نشر باسم نادٍ آخر</span>
+  authorName = user.club_name || user.username;  <span class="cmt">-- اسم النادي تلقائياً</span>
+} <span class="kw">else</span> {
+  <span class="cmt">// editors/super_admins: حرية اختيار category</span>
+  category = allowed.includes(req.body.category) ? req.body.category : <span class="str">'general'</span>;
+}</pre>
+
+<h3 id="mw-rate">Rate Limiter — 3 مستويات</h3>
+<table>
+  <tr><th>الحارس</th><th>النافذة</th><th>الحد</th><th>يُطبَّق على</th></tr>
+  <tr><td><code>generalLimiter</code></td><td>15 دقيقة</td><td>200 طلب/IP</td><td>كل /api/*</td></tr>
+  <tr><td><code>authLimiter</code></td><td>15 دقيقة</td><td>10 محاولات/IP</td><td>POST /login</td></tr>
+  <tr><td><code>strictAuthLimiter</code></td><td>ساعة</td><td>3 محاولات/IP</td><td>POST /register</td></tr>
+  <tr><td><code>uploadLimiter</code></td><td>ساعة</td><td>20 رفع/IP</td><td>POST /news, /missing</td></tr>
+</table>
+
+<!-- ══ CONTROLLERS ════════════════════════════════ -->
+
+<h2 id="ctrl-auth">Auth Controller — منطق الأعمال</h2>
+
+<h3>register()</h3>
+<pre><span class="cmt">// POST {AUTH_PREFIX}/register</span>
+<span class="num">1</span>. express-validator التحقق من المدخلات
+<span class="num">2</span>. فحص تعارض username/email (استعلام واحد)
+<span class="num">3</span>. await bcrypt.hash(password, <span class="num">12</span>)
+<span class="num">4</span>. INSERT users { role: <span class="str">'pending'</span>, is_active: <span class="num">0</span> }   <span class="cmt">← دائماً</span>
+<span class="num">5</span>. INSERT notifications → target_role: <span class="str">'super_admin'</span>   <span class="cmt">← يُبلَّغ رائد</span>
+<span class="num">6</span>. audit log: REGISTER
+<span class="num">7</span>. 201 { message: 'Registration submitted' }   <span class="cmt">← لا توكن بعد</span></pre>
+
+<h3>login()</h3>
+<pre><span class="cmt">// POST {AUTH_PREFIX}/login</span>
+<span class="num">1</span>. SELECT * FROM users WHERE username=? OR email=?
+<span class="num">2</span>. <span class="cmt">// Constant-time comparison — لمنع timing attacks</span>
+   <span class="kw">const</span> DUMMY = <span class="str">'$2b$12$INVALID.HASH.PADDED.FOR.CONSTANT.TIME...'</span>;
+   <span class="kw">const</span> match = user ? bcrypt.compare(pw, user.password)
+                      : bcrypt.compare(pw, DUMMY); <span class="cmt">← يعمل حتى لو لا يوجد مستخدم</span>
+<span class="num">3</span>. فحص role === 'pending' ──▶  403 PENDING_APPROVAL
+<span class="num">4</span>. فحص is_active === 0    ──▶  403 ACCOUNT_INACTIVE
+<span class="num">5</span>. issueTokenPair(user, { ip, userAgent })
+   ├── accessToken:  JWT HS256, expires 15m
+   └── refreshToken: 48-byte random hex → sha256 hash → DB
+<span class="num">6</span>. UPDATE users SET last_login, login_count++
+<span class="num">7</span>. 200 { accessToken, refreshToken, expiresAt, user: safeUser }</pre>
+
+<h3>refresh()</h3>
+<pre><span class="cmt">// POST {AUTH_PREFIX}/refresh — بدون requireAuth (لأن access token منتهٍ)</span>
+<span class="num">1</span>. sha256(refreshToken) → البحث في refresh_tokens
+<span class="num">2</span>. فحص expires_at > now()
+<span class="num">3</span>. جلب المستخدم — فحص is_active
+<span class="num">4</span>. DELETE refresh_tokens WHERE id = stored.id   <span class="cmt">← Token Rotation</span>
+<span class="num">5</span>. issueTokenPair(user) — توكن جديد كلياً
+<span class="num">6</span>. 200 { accessToken, refreshToken, expiresAt }</pre>
+
+<!-- ══ ADMIN CONTROLLER ════════════════════════════ -->
+
+<h2 id="ctrl-admin">Admin Controller — بوابة التفعيل اليدوي</h2>
+
+<h3>activateUser() — أهم دالة في النظام</h3>
+<pre><span class="cmt">// PATCH /api/admin/users/:id/activate</span>
+<span class="cmt">// requireAuth + requireSuperAdmin — رائد الزهراني فقط</span>
+
+<span class="kw">const</span> { role, club_name, club_id } = req.body;
+
+<span class="cmt">// حماية إضافية: لمنح super_admin يجب إرسال confirm_super_admin</span>
+<span class="kw">if</span> (role === <span class="str">‘super_admin’</span>) {
+<span class="kw">if</span> (req.body.confirm_super_admin !== <span class="str">‘YES_I_UNDERSTAND’</span>)
+<span class="kw">return</span> <span class="num">400</span>;
+}
+
+<span class="kw">UPDATE</span> users <span class="kw">SET</span>
+role      = role,
+club_name = club_name,   <span class="cmt">← اسم النادي للعرض العام</span>
+club_id   = club_id,     <span class="cmt">← ID للفلترة</span>
+is_active = <span class="num">1</span>,           <span class="cmt">← هذا هو مفتاح فتح الحساب</span>
+updated_at = now()
+<span class="kw">WHERE</span> id = :id
+
+<span class="cmt">// إشعار للمستخدم المُفعَّل</span>
+<span class="kw">INSERT INTO</span> notifications …target_role: <span class="str">‘all’</span>…
+
+<span class="cmt">// تسجيل في سجل التدقيق</span>
+audit(actor_id, <span class="str">‘ACTIVATE_USER’</span>, <span class="str">‘users’</span>, target_id, {…}, ip)</pre>
+
+<!-- ══ CACHE CONTROLLER ════════════════════════════ -->
+
+<h2 id="ctrl-cache">Cache Controller — Offline Sync</h2>
+<p>هذا المتحكم هو حلقة الوصل بين الـ backend والـ Service Worker. يُنتج snapshot واحداً يحتوي على كل البيانات العامة التي تحتاجها الصفحات.</p>
+
+<h3>getSnapshot()</h3>
+<pre><span class="cmt">// GET /api/cache/snapshot — public</span>
+<span class="cmt">// Cache-Control: public, max-age=300, stale-while-revalidate=60</span>
+
+<span class="kw">return</span> {
+generatedAt: now,
+news:          <span class="kw">SELECT</span> … <span class="kw">WHERE</span> is_published=<span class="num">1</span> <span class="kw">LIMIT</span> <span class="num">30</span>,
+events:        <span class="kw">SELECT</span> … <span class="kw">WHERE</span> event_date <span class="kw">BETWEEN</span> now <span class="kw">AND</span> now+30days,
+missing:       <span class="kw">SELECT</span> … <span class="kw">WHERE</span> is_approved=<span class="num">1</span> <span class="kw">AND</span> is_resolved=<span class="num">0</span>,
+ads:           <span class="kw">SELECT</span> … <span class="kw">WHERE</span> is_active=<span class="num">1</span> <span class="kw">AND</span> now <span class="kw">BETWEEN</span> start_at <span class="kw">AND</span> end_at,
+notifications: <span class="kw">SELECT</span> … <span class="kw">WHERE</span> target_role=<span class="str">‘all’</span>
+}
+<span class="cmt">// لا يحتوي على: passwords, tokens, emails, private data</span></pre>
+
+<h3>getDelta()</h3>
+<pre><span class="cmt">// GET /api/cache/delta — lightweight check</span>
+<span class="cmt">// الـ PWA يتحقق هل البيانات تغيّرت قبل تحميل snapshot كامل</span>
+
+<span class="kw">return</span> {
+news:          <span class="kw">MAX</span>(updated_at) <span class="kw">FROM</span> news,
+events:        <span class="kw">MAX</span>(updated_at) <span class="kw">FROM</span> events,
+missing:       <span class="kw">MAX</span>(created_at) <span class="kw">FROM</span> missing_items,
+ads:           <span class="kw">MAX</span>(updated_at) <span class="kw">FROM</span> ads,
+notifications: <span class="kw">MAX</span>(created_at) <span class="kw">FROM</span> notifications
+}</pre>
+
+<!-- ══ OFFLINE STRATEGY ════════════════════════════ -->
+
+<h2 id="offline-strategy">Offline-First Sync Strategy</h2>
+
+<div class="callout callout-green">
+  <strong>الهدف:</strong> المستخدم العادي لا يشعر بفرق إذا انقطع الإنترنت. يعرض البيانات المحفوظة تلقائياً.
+</div>
+
+<h3 id="offline-flow">مسار البيانات الكامل</h3>
+<pre>
+<span class="cmt">─── عند أول تشغيل (أو بعد كل 5 دقائق) ──────────────────────</span>
+
+api.js: Cache.forceRefresh()
+──▶ GET /api/cache/snapshot
+──▶ localStorage.setItem(‘madkhal_snapshot’, JSON.stringify({ data, ts }))
+
+<span class="cmt">─── عند طلب البيانات ──────────────────────────────────────────</span>
+
+api.js: API.getNews(category, page)
+├── try: fetch(’/api/news?category=X’)
+│     ✓ success ──▶ return response
+│     ✗ network error (offline):
+│         └── Cache.get() → localStorage
+│               ✓ found: return { data: cached.news, offline: true }
+│               ✗ not found: throw error
+└── ui shows toast: ‘يعرض بيانات محفوظة’
+
+<span class="cmt">─── Service Worker (sw.js) ────────────────────────────────────</span>
+
+App Shell (HTML/CSS/JS):  Cache-First strategy
+├── hit: serve from STATIC_CACHE instantly
+└── miss: fetch → cache → return
+
+/api/cache/snapshot:      Network-First + DATA_CACHE fallback
+├── network ok: serve + update cache
+└── offline:    serve from DATA_CACHE
+
+/api/* (other):           Network-Only
+└── offline: return { success: false, offline: true }
+
+<span class="cmt">─── عند العودة للإنترنت ───────────────────────────────────────</span>
+
+window.addEventListener(‘online’, () => {
+Cache.forceRefresh()  // تحديث صامت في الخلفية
+document.dispatchEvent(new CustomEvent(‘mk:online’))
+})</pre>
+
+<h3>تدفق الـ localStorage</h3>
+<table>
+  <tr><th>المفتاح</th><th>المحتوى</th><th>TTL</th></tr>
+  <tr><td><code>madkhal_snapshot</code></td><td>{ data: {...}, ts: timestamp }</td><td>5 دقائق</td></tr>
+  <tr><td><code>mk_access</code></td><td>JWT access token</td><td>15 دقيقة (sessionStorage)</td></tr>
+  <tr><td><code>mk_refresh</code></td><td>Refresh token (hex)</td><td>7 أيام</td></tr>
+  <tr><td><code>mk_user</code></td><td>{ id, username, role, club_name }</td><td>حتى logout</td></tr>
+  <tr><td><code>mk_notifications</code></td><td>مصفوفة الإشعارات</td><td>حتى التحديث التالي</td></tr>
+  <tr><td><code>mk_theme</code></td><td>'light' | 'dark'</td><td>دائم</td></tr>
+</table>
+
+<!-- ══ API ROUTES TABLE ════════════════════════════ -->
+
+<h2 id="routes-auth">جدول جميع API Routes</h2>
+
+<h3>Auth Routes — <code>{AUTH_PREFIX}</code> (مخفي)</h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Guard</th><th>الوظيفة</th></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/register</code></td><td><span class="badge badge-public">Public</span></td><td>تسجيل حساب جديد → pending</td></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/login</code></td><td><span class="badge badge-public">Public</span></td><td>دخول + إصدار توكن</td></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/refresh</code></td><td><span class="badge badge-public">Public</span></td><td>تجديد access token</td></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/logout</code></td><td><span class="badge badge-club">Auth</span></td><td>حذف refresh token</td></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/logout-all</code></td><td><span class="badge badge-club">Auth</span></td><td>إلغاء كل الجلسات</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/me</code></td><td><span class="badge badge-club">Auth</span></td><td>بيانات المستخدم الحالي</td></tr>
+  <tr><td><span class="badge badge-patch">PATCH</span></td><td><code>/me/password</code></td><td><span class="badge badge-club">Auth</span></td><td>تغيير كلمة المرور</td></tr>
+</table>
+
+<h3 id="routes-news">News Routes — <code>/api/news</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Guard</th><th>الوظيفة</th></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/</code></td><td><span class="badge badge-public">Public</span></td><td>قائمة الأخبار (pagination)</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/:id</code></td><td><span class="badge badge-public">Public</span></td><td>خبر واحد + views++</td></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/</code></td><td><span class="badge badge-club">Club+</span></td><td>نشر خبر جديد</td></tr>
+  <tr><td><span class="badge badge-patch">PUT</span></td><td><code>/:id</code></td><td><span class="badge badge-club">Club+</span></td><td>تعديل (author أو super_admin)</td></tr>
+  <tr><td><span class="badge badge-delete">DELETE</span></td><td><code>/:id</code></td><td><span class="badge badge-admin">SuperAdmin</span></td><td>حذف خبر</td></tr>
+</table>
+
+<h3 id="routes-admin">Admin Routes — <code>/api/admin</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>الوظيفة</th></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/users?status=pending</code></td><td>قائمة المستخدمين (فلتر)</td></tr>
+  <tr><td><span class="badge badge-patch">PATCH</span></td><td><code>/users/:id/activate</code></td><td>⭐ تفعيل حساب + تعيين دور</td></tr>
+  <tr><td><span class="badge badge-patch">PATCH</span></td><td><code>/users/:id/deactivate</code></td><td>تعطيل + إلغاء كل التوكنات</td></tr>
+  <tr><td><span class="badge badge-delete">DELETE</span></td><td><code>/users/:id</code></td><td>حذف مستخدم</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/stats</code></td><td>إحصائيات لوحة التحكم</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/audit-log</code></td><td>سجل التدقيق (pagination)</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/notifications</code></td><td>إشعارات المدير</td></tr>
+  <tr><td><span class="badge badge-post">POST</span></td><td><code>/notifications</code></td><td>إرسال إشعار</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/missing/pending</code></td><td>بلاغات المفقودات بانتظار الموافقة</td></tr>
+  <tr><td><span class="badge badge-patch">PATCH</span></td><td><code>/missing/:id/approve</code></td><td>قبول بلاغ</td></tr>
+  <tr><td><span class="badge badge-delete">DELETE</span></td><td><code>/missing/:id/reject</code></td><td>رفض بلاغ</td></tr>
+</table>
+
+<h3 id="routes-cache">Cache/Sync Routes — <code>/api/cache</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>الوظيفة</th></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/snapshot</code></td><td>Bundle كامل للـ PWA offline cache</td></tr>
+  <tr><td><span class="badge badge-get">GET</span></td><td><code>/delta</code></td><td>timestamps آخر تحديث (lightweight check)</td></tr>
+</table>
+
+<!-- ══ LOCAL SETUP ════════════════════════════════ -->
+
+<h2 id="setup-local">🚀 تشغيل المشروع محلياً</h2>
+
+<div class="steps">
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h4>المتطلبات الأساسية</h4>
+    <pre>node --version    <span class="cmt"># يجب أن يكون 18+ </span>
+npm --version     <span class="cmt"># 9+</span>
+git --version     <span class="cmt"># لاستنساخ المشروع</span></pre>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h4>استنساخ وتجهيز الـ Backend</h4>
+    <pre><span class="cmt"># الانتقال إلى مجلد الـ backend</span>
+cd madkhal-rebuild/backend
+
+<span class="cmt"># تثبيت التبعيات</span>
+npm install
+
+<span class="cmt"># إنشاء ملف الإعدادات</span>
+cp .env.example .env</pre>
+
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h4>تعديل ملف .env (مطلوب)</h4>
+    <pre><span class="cmt"># افتح .env وعدّل هذه القيم على الأقل:</span>
+
+<span class="cmt"># 1. أنشئ JWT_SECRET عشوائياً:</span>
+node -e <span class="str">“console.log(require(‘crypto’).randomBytes(64).toString(‘hex’))”</span>
+<span class="cmt"># انسخ الناتج وضعه في JWT_SECRET=</span>
+
+<span class="cmt"># 2. غيّر AUTH_ROUTE_PREFIX إلى رابط مخفي:</span>
+AUTH_ROUTE_PREFIX=/my-secret-gate-2026
+
+<span class="cmt"># 3. بيانات المدير الأول (ستُنشأ عند أول تشغيل):</span>
+SEED_ADMIN_USERNAME=raed_admin
+SEED_ADMIN_EMAIL=raed@juportal.online
+SEED_ADMIN_PASSWORD=MyStrongPass@123!</pre>
+<div class="callout callout-warn">
+<strong>⚠️ مهم جداً:</strong> لا تضع <code>JWT_SECRET</code> كلمة بسيطة. استخدم الأمر أعلاه لإنشاء 64 byte عشوائي.
+</div>
+
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h4>تشغيل الـ Backend</h4>
+    <pre><span class="cmt"># وضع التطوير (مع إعادة تشغيل تلقائية)</span>
+npm run dev
+
+<span class="cmt"># أو وضع الإنتاج</span>
+npm start</pre>
+<p>ستظهر هذه الرسالة عند النجاح:</p>
+<pre>✅ Super admin seeded: raed_admin
+✅ Database ready: ./data/madkhal.db
+╔══════════════════════════════════════════════╗
+║     MADKHAL BACKEND v2.0  —  مدخل            ║
+╠══════════════════════════════════════════════╣
+║  Port:    3000                                ║
+║  Mode:    development                         ║
+║  Auth at: /my-secret-gate-2026               ║
+╚══════════════════════════════════════════════╝</pre>
+
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <h4>تشغيل الـ Frontend</h4>
+    <pre><span class="cmt"># في terminal منفصل</span>
+cd madkhal-rebuild/frontend
+
+<span class="cmt"># الخيار الأفضل: VS Code Live Server</span>
+<span class="cmt"># (Install extension: Live Server by Ritwick Dey)</span>
+<span class="cmt"># ثم Right-click على index.html → Open with Live Server</span>
+
+<span class="cmt"># أو استخدام serve:</span>
+npx serve WebAppPage -p 5500</pre>
+
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">6</div>
+  <div class="step-body">
+    <h4>ربط الـ Frontend بالـ Backend</h4>
+    <p>في <code>frontend/WebAppPage/js/api.js</code> السطر الأول:</p>
+    <pre><span class="kw">const</span> API_BASE = window.MADKHAL_CONFIG?.apiBase
+  || <span class="str">'http://localhost:3000/api'</span>;  <span class="cmt">← للتطوير المحلي</span>
+<span class="cmt">// في الإنتاج: 'https://juportal.online/api'</span></pre>
+    <p>وفي <code>api.js</code> دالة <code>AuthAPI._base()</code>:</p>
+    <pre><span class="cmt">// تأكد أن AUTH_ROUTE_PREFIX يتطابق مع .env</span>
+<span class="kw">return</span> <span class="str">`${url.origin}/my-secret-gate-2026`</span>;</pre>
+  </div>
+</div>
+
+</div>
+
+<!-- ══ TESTING ══════════════════════════════════════ -->
+
+<h2 id="setup-test">🧪 اختبار الـ API</h2>
+
+<h3>اختبار التسجيل والدخول</h3>
+<pre><span class="cmt"># تسجيل حساب نادي جديد</span>
+curl -X POST http://localhost:3000/my-secret-gate-2026/register \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"username":"sports_club","email":"sports@jic.edu","password":"Test@1234","club_name":"النادي الرياضي","requested_role":"club"}'</span>
+
+<span class="cmt"># محاولة الدخول قبل التفعيل — يجب أن يعود 403 PENDING_APPROVAL</span>
+curl -X POST http://localhost:3000/my-secret-gate-2026/login   
+-H <span class="str">“Content-Type: application/json”</span>   
+-d <span class="str">’{“username”:“sports_club”,“password”:“Test@1234”}’</span>
+
+<span class="cmt"># دخول المدير الرئيسي</span>
+curl -X POST http://localhost:3000/my-secret-gate-2026/login   
+-H <span class="str">“Content-Type: application/json”</span>   
+-d <span class="str">’{“username”:“raed_admin”,“password”:“MyStrongPass@123!”}’</span></pre>
+
+<h3>تفعيل حساب (بتوكن المدير)</h3>
+<pre><span class="cmt"># احتفظ بالـ accessToken من خطوة دخول المدير</span>
+<span class="kw">TOKEN</span>=<span class="str">"eyJ..."</span>
+<span class="kw">USER_ID</span>=<span class="str">"uuid-of-sports-club"</span>
+
+curl -X PATCH http://localhost:3000/api/admin/users/<span class="var">$USER_ID</span>/activate   
+-H <span class="str">“Authorization: Bearer $TOKEN”</span>   
+-H <span class="str">“Content-Type: application/json”</span>   
+-d <span class="str">’{“role”:“club”,“club_name”:“النادي الرياضي”,“club_id”:“sports”}’</span></pre>
+
+<h3>اختبار RBAC — نشر خبر بحساب نادٍ</h3>
+<pre><span class="cmt"># الدخول بحساب النادي بعد التفعيل</span>
+<span class="kw">CLUB_TOKEN</span>=<span class="str">"eyJ..."</span>
+
+<span class="cmt"># محاولة نشر خبر كـ category=‘general’ — سيُغير تلقائياً إلى ‘club’</span>
+curl -X POST http://localhost:3000/api/news   
+-H <span class="str">“Authorization: Bearer $CLUB_TOKEN”</span>   
+-F <span class="str">“title=انتصار النادي الرياضي”</span>   
+-F <span class="str">“body=<p>فاز نادينا بالبطولة!</p>”</span>   
+-F <span class="str">“category=general”</span>
+<span class="cmt"># ← ستجد في الـ response: category=‘club’ بغض النظر عما أرسلته</span></pre>
+
+<h3>اختبار الـ Offline Snapshot</h3>
+<pre><span class="cmt"># جلب الـ snapshot (public — بدون توكن)</span>
+curl http://localhost:3000/api/cache/snapshot | python3 -m json.tool
+
+<span class="cmt"># فحص الـ delta</span>
+curl http://localhost:3000/api/cache/delta</pre>
+
+<h3>فحص الصحة</h3>
+<pre>curl http://localhost:3000/api/health
+<span class="cmt"># {"status":"ok","timestamp":"2026-05-25T..."}</span></pre>
+
+<!-- ══ DEPLOY NOTES ════════════════════════════════ -->
+
+<h2 id="setup-deploy">📦 ملاحظات للـ Production</h2>
+
+<table>
+  <tr><th>الموضوع</th><th>التوصية</th></tr>
+  <tr><td>Process Manager</td><td><code>pm2 start src/server.js --name madkhal</code></td></tr>
+  <tr><td>Reverse Proxy</td><td>Nginx أمام Express — يعالج SSL وضغط الملفات الثابتة</td></tr>
+  <tr><td>SSL</td><td>Let's Encrypt + Certbot — مجاني وتلقائي</td></tr>
+  <tr><td>DB Backup</td><td><code>sqlite3 madkhal.db ".backup backup-$(date +%F).db"</code> في cron كل يوم</td></tr>
+  <tr><td>Upload Storage</td><td>فعّل Cloudinary في .env — لا تحفظ الصور على الخادم</td></tr>
+  <tr><td>Logs</td><td>Morgan يكتب في <code>logs/access.log</code> في production mode</td></tr>
+  <tr><td>TRUST_PROXY</td><td>اضبط <code>TRUST_PROXY=1</code> إذا كان وراء Nginx/Cloudflare</td></tr>
+  <tr><td>NODE_ENV</td><td>اضبط <code>NODE_ENV=production</code> لإخفاء stack traces</td></tr>
+</table>
+
+<div class="callout callout-red">
+  <strong>🔴 تحقق قبل الإطلاق:</strong><br>
+  ✗ لا تنشر .env في GitHub<br>
+  ✗ غيّر SEED_ADMIN_PASSWORD فوراً بعد أول دخول<br>
+  ✗ غيّر AUTH_ROUTE_PREFIX إلى شيء لا يمكن تخمينه<br>
+  ✗ تأكد أن JWT_SECRET طوله 64 byte على الأقل<br>
+  ✓ أضف .env و data/ و uploads/ إلى .gitignore
+</div>
+
+<pre><span class="cmt"># .gitignore</span>
+.env
+data/
+uploads/
+logs/
+node_modules/</pre>
+
+<div style="margin-top:60px;padding-top:24px;border-top:1px solid var(--border);color:var(--muted);font-size:0.8rem;text-align:center;">
+  منصة مدخل Backend v2.0 — مبادرة طلابية · JIC/JTI © 2026
+</div>
+
+</main>
+</div>
+
+<script>
+// Highlight active sidebar link on scroll
+const sections = document.querySelectorAll('section[id], h2[id], h3[id]');
+const links = document.querySelectorAll('.sidebar a');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => observer.observe(s));
+
+// Copy buttons
+document.querySelectorAll('pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'pre-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'نسخ';
+  btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = '✓ تم';
+      setTimeout(() => btn.textContent = 'نسخ', 2000);
+    });
+  });
+  wrap.appendChild(btn);
+});
+</script>
+
+</body>
+</html>
