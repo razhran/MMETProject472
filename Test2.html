@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>التقرير الأمني - منصة مدخل</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #1a1a1a;
+            margin: 0 0 10px 0;
+        }
+        .header p {
+            color: #666;
+            margin: 0;
+        }
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #eee;
+        }
+        .strengths .section-title { color: #2e7d32; border-color: #2e7d32; }
+        .weaknesses .section-title { color: #c62828; border-color: #c62828; }
+        
+        ul { padding-right: 20px; }
+        li { margin-bottom: 15px; }
+        strong { display: inline-block; margin-bottom: 5px; font-size: 1.1em; }
+        
+        .strengths strong { color: #2e7d32; }
+        .weaknesses strong { color: #c62828; }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>التقرير الأمني والمراجعة الهيكلية</h1>
+        <p>مشروع منصة مدخل (Madkhal PWA Backend)</p>
+    </div>
+
+    <div class="strengths">
+        <h2 class="section-title">نقاط القوة (ميزات الأمان المفعلة)</h2>
+        <ul>
+            <li>
+                <strong>بوابة التفعيل اليدوي (Activation Gate)</strong><br>
+                [span_0](start_span)النظام يعتمد مبدأ "الرفض الافتراضي" للمستخدمين الجدد، حيث يتم تسجيلهم بحالة <code>is_active: 0</code> ودور <code>pending</code>[span_0](end_span). [span_1](start_span)لا يمكن تفعيل الحساب أو منحه دور مثل النادي إلا بتدخل مباشر من المدير الرئيسي (super_admin) وتأكيد صريح[span_1](end_span).
+            </li>
+            <li>
+                <strong>نظام الصلاحيات الصارم (RBAC)</strong><br>
+                [span_2](start_span)كل مسار برمجي (Route) محمي بحارس (Guard) محدد ولا يوجد صلاحية وصول افتراضية[span_2](end_span). [span_3](start_span)يتم فرض الصلاحيات بقوة، مثل إجبار فئة الأخبار لتكون <code>club</code> للأندية بغض النظر عن محتوى الطلب المرسل[span_3](end_span).
+            </li>
+            <li>
+                <strong>إدارة الجلسات ودوران التوكن (Token Rotation)</strong><br>
+                [span_4](start_span)يتم إصدار <code>access token</code> قصير الأمد (15 دقيقة)[span_4](end_span). [span_5](start_span)يتم تبديل <code>refresh token</code> بالكامل وحذفه من قاعدة البيانات عند كل عملية تجديد، مما يحد من فرص اختطاف الجلسات[span_5](end_span).
+            </li>
+            <li>
+                <strong>مكافحة هجمات التوقيت (Timing Attacks)</strong><br>
+                [span_6](start_span)في عملية تسجيل الدخول، يتم استخدام مقارنة وهمية بوقت ثابت في حال عدم وجود المستخدم في قاعدة البيانات، لمنع المخترقين من معرفة الحسابات المسجلة[span_6](end_span).
+            </li>
+            <li>
+                <strong>تقييد الطلبات (Rate Limiting) والحماية المدمجة</strong><br>
+                [span_7](start_span)[span_8](start_span)استخدام مكتبات مثل <code>Helmet</code> و <code>HPP</code> وتطبيق 3 مستويات من محددات الطلبات (للتسجيل، الدخول، والرفع) لصد هجمات حجب الخدمة (DDoS)[span_7](end_span)[span_8](end_span).
+            </li>
+        </ul>
+    </div>
+
+    <div class="weaknesses">
+        <h2 class="section-title">نقاط الضعف (الثغرات المحتملة التي تتطلب معالجة)</h2>
+        <ul>
+            <li>
+                <strong>انعدام التقييد الصارم لرفع الملفات</strong><br>
+                [span_9](start_span)النظام يدعم رفع الصور عبر <code>Multer</code>[span_9](end_span). [span_10](start_span)تقييد معدل الرفع مفعّل[span_10](end_span)، لكن عدم وجود فلترة برمجية صارمة لامتدادات الملفات (مثل السماح فقط بـ jpg, png) قد يسمح برفع ملفات تنفيذية خبيثة (Web Shells).
+            </li>
+            <li>
+                <strong>احتمالية ثغرات XSS في محرر النصوص</strong><br>
+                [span_11](start_span)بما أن النظام يسمح للأندية باستخدام محرر نصوص وحفظ <code>HTML sanitise</code>[span_11](end_span)، أي قصور في مكتبة التنظيف قد يؤدي إلى حقن كود جافاسكريبت ضار يتنفذ لدى بقية المستخدمين.
+            </li>
+            <li>
+                <strong>مخاطر تسريب المفتاح السري (JWT Secret)</strong><br>
+                [span_12](start_span)أمان النظام بأكمله يعتمد على مفتاح <code>JWT_SECRET</code> بخوارزمية HS256[span_12](end_span). [span_13](start_span)التعليمات تنص على إنشاء مفتاح عشوائي بطول 64 بايت[span_13](end_span)، وإذا تم تسريبه (عبر رفع ملف .env للعامة مثلاً)، سيتمكن المهاجم من تزوير صلاحيات المشرف.
+            </li>
+            <li>
+                <strong>الاعتماد على إخفاء الرابط (Security by Obscurity)</strong><br>
+                [span_14](start_span)النظام يضع مسارات التسجيل والدخول خلف رابط مخفي متغير <code>AUTH_ROUTE_PREFIX</code>[span_14](end_span). [span_15](start_span)هذه الممارسة تضيف طبقة إرباك جيدة، لكنها ليست حماية أساسية ولا يجب الاعتماد عليها كلياً حال تسرب الرابط[span_15](end_span).
+            </li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        تم توليد هذا التقرير لتوضيح الهيكلية الأمنية لمنصة مدخل بناءً على الدليل المعماري المرفق.
+    </div>
+</div>
+
+</body>
+</html>
